@@ -15,86 +15,129 @@
 
 <template>
   <div>
-    <b-alert
-        v-model="showSaveNotification"
-        variant="success"
-        dismissible
-        fade
-    >
+    <b-alert v-model="showSaveNotification" variant="success" dismissible fade>
       {{ saveNotificationMessage }}
     </b-alert>
     <b-alert
-        v-model="showVocabularyNotification"
-        :variant="vocabularyNotificationStatus"
-        dismissible
-        fade
+      v-model="showVocabularyNotification"
+      :variant="vocabularyNotificationStatus"
+      dismissible
+      fade
     >
       {{ vocabularyNotificationMessage }}
     </b-alert>
-    <b-modal ref="vocab-modal" size="lg" title="Save Vocabulary?" :ok-disabled="validVocabularyName === false || (customVocabularySelected === '' && customVocabularyCreateNew === '') || customVocabularyUnion.length === 0" ok-title="Save" @ok="saveVocabulary()">
+    <b-modal
+      ref="vocab-modal"
+      size="lg"
+      title="Save Vocabulary?"
+      :ok-disabled="
+        validVocabularyName === false ||
+        (customVocabularySelected === '' && customVocabularyCreateNew === '') ||
+        customVocabularyUnion.length === 0
+      "
+      ok-title="Save"
+      @ok="saveVocabulary()"
+    >
       <b-row>
         <b-col>
           <b>Select a vocabulary to overwrite:</b>
-          <b-form-group v-if="customVocabularyList.length>0">
+          <b-form-group v-if="customVocabularyList.length > 0">
             <b-form-radio-group
-                id="custom-vocab-selection"
-                v-model="customVocabularySelected"
-                name="custom-vocab-list"
-                :options="customVocabularyList"
-                text-field="name_and_status"
-                value-field="name"
-                disabled-field="notEnabled"
-                stacked
+              id="custom-vocab-selection"
+              v-model="customVocabularySelected"
+              name="custom-vocab-list"
+              :options="customVocabularyList"
+              text-field="name_and_status"
+              value-field="name"
+              disabled-field="notEnabled"
+              stacked
             >
             </b-form-radio-group>
           </b-form-group>
-          <div v-if="customVocabularyList.length > 0 && customVocabularySelected !== ''">
-            Delete the selected vocabulary (optional): <b-button v-b-tooltip.hover.right size="sm" title="Delete selected vocabulary" variant="danger" @click="deleteVocabulary">
-            Delete
-          </b-button>
+          <div
+            v-if="
+              customVocabularyList.length > 0 && customVocabularySelected !== ''
+            "
+          >
+            Delete the selected vocabulary (optional):
+            <b-button
+              v-b-tooltip.hover.right
+              size="sm"
+              title="Delete selected vocabulary"
+              variant="danger"
+              @click="deleteVocabulary"
+            >
+              Delete
+            </b-button>
           </div>
         </b-col>
         <b-col>
-          <b>Or create a new vocabulary:</b><br>
+          <b>Or create a new vocabulary:</b><br />
           <!-- The state on this text area will show a red alert icon if
-    the user enters an invalid custom vocabulary name. Otherwise we
-    set the state to null so no validity indicator is shown. -->
+              the user enters an invalid custom vocabulary name. Otherwise we
+              set the state to null so no validity indicator is shown. -->
           Vocabulary Name:
-          <b-form-input v-if="customVocabularyList.length>0" v-model="customVocabularyCreateNew" size="sm" placeholder="Enter vocabulary name (optional)" :state="validVocabularyName ? null : false" @focus="customVocabularySelected=''"></b-form-input>
-          <b-form-input v-else v-model="customVocabularyCreateNew" size="sm" placeholder="Enter vocabulary name" :state="validVocabularyName ? null : false"></b-form-input>
+          <b-form-input
+            v-if="customVocabularyList.length > 0"
+            v-model="customVocabularyCreateNew"
+            size="sm"
+            placeholder="Enter vocabulary name (optional)"
+            :state="validVocabularyName ? null : false"
+            @focus="customVocabularySelected = ''"
+          ></b-form-input>
+          <b-form-input
+            v-else
+            v-model="customVocabularyCreateNew"
+            size="sm"
+            placeholder="Enter vocabulary name"
+            :state="validVocabularyName ? null : false"
+          ></b-form-input>
           Vocabulary Language:
           <b-form-select
-              v-model="vocabulary_language_code"
-              :options="transcribeLanguages"
-              size="sm"
+            v-model="vocabulary_language_code"
+            :options="transcribeLanguages"
+            size="sm"
           />
-          <hr>
+          <hr />
           <label>Draft vocabulary name: </label> {{ customVocabularyName }}
-          <div v-if="customVocabularySelected === '' && customVocabularyCreateNew === ''" style="color:red">
+          <div
+            v-if="
+              customVocabularySelected === '' &&
+              customVocabularyCreateNew === ''
+            "
+            style="color: red"
+          >
             Select a vocabulary name or specify a new vocabulary name.
           </div>
-          <br>
-          <label>Draft vocabulary language:</label> {{ vocabulary_language_code }}
+          <br />
+          <label>Draft vocabulary language:</label>
+          {{ vocabulary_language_code }}
         </b-col>
       </b-row>
-      <hr>
+      <hr />
       <div v-if="customVocabularyUnsaved.length !== 0">
         Draft vocabulary (click to edit):
-        <div v-if="customVocabularySelected != ''" class="text-info" style="font-size: 80%">
-          Rows shown in blue are from vocabulary, <b>{{ customVocabularySelected }}.</b>
+        <div
+          v-if="customVocabularySelected != ''"
+          class="text-info"
+          style="font-size: 80%"
+        >
+          Rows shown in blue are from vocabulary,
+          <b>{{ customVocabularySelected }}.</b>
         </div>
       </div>
       <b-table
-          :items="customVocabularyUnion"
-          :fields="customVocabularyFields"
-          selectable
-          select-mode="single"
-          fixed responsive="sm"
-          bordered
-          small
+        :items="customVocabularyUnion"
+        :fields="customVocabularyFields"
+        selectable
+        select-mode="single"
+        fixed
+        responsive="sm"
+        bordered
+        small
       >
         <!-- This template adds an additional row in the header
-to highlight the fields in the custom vocab schema. -->
+          to highlight the fields in the custom vocab schema. -->
         <template #default>
           <b-tr>
             <b-th colspan="1"></b-th>
@@ -107,10 +150,20 @@ to highlight the fields in the custom vocab schema. -->
           <b-row no-gutters>
             <b-col cols="10">
               <div v-if="row.index < customVocabularyUnsaved.length">
-                <b-form-input v-model="row.item.original_phrase" class="custom-text-field" :formatter="phrase_formatter" lazy-formatter />
+                <b-form-input
+                  v-model="row.item.original_phrase"
+                  class="custom-text-field"
+                  :formatter="phrase_formatter"
+                  lazy-formatter
+                />
               </div>
               <div v-else>
-                <b-form-input v-model="row.item.original_phrase" class="custom-text-field text-info" :formatter="phrase_formatter" lazy-formatter />
+                <b-form-input
+                  v-model="row.item.original_phrase"
+                  class="custom-text-field text-info"
+                  :formatter="phrase_formatter"
+                  lazy-formatter
+                />
               </div>
             </b-col>
           </b-row>
@@ -119,10 +172,20 @@ to highlight the fields in the custom vocab schema. -->
           <b-row no-gutters>
             <b-col cols="10">
               <div v-if="row.index < customVocabularyUnsaved.length">
-                <b-form-input v-model="row.item.new_phrase" class="custom-text-field" :formatter="phrase_formatter" lazy-formatter />
+                <b-form-input
+                  v-model="row.item.new_phrase"
+                  class="custom-text-field"
+                  :formatter="phrase_formatter"
+                  lazy-formatter
+                />
               </div>
               <div v-else>
-                <b-form-input v-model="row.item.new_phrase" class="custom-text-field text-info" :formatter="phrase_formatter" lazy-formatter />
+                <b-form-input
+                  v-model="row.item.new_phrase"
+                  class="custom-text-field text-info"
+                  :formatter="phrase_formatter"
+                  lazy-formatter
+                />
               </div>
             </b-col>
           </b-row>
@@ -131,10 +194,16 @@ to highlight the fields in the custom vocab schema. -->
           <b-row no-gutters>
             <b-col cols="10">
               <div v-if="row.index < customVocabularyUnsaved.length">
-                <b-form-input v-model="row.item.sounds_like" class="custom-text-field" />
+                <b-form-input
+                  v-model="row.item.sounds_like"
+                  class="custom-text-field"
+                />
               </div>
               <div v-else>
-                <b-form-input v-model="row.item.sounds_like" class="custom-text-field text-info" />
+                <b-form-input
+                  v-model="row.item.sounds_like"
+                  class="custom-text-field text-info"
+                />
               </div>
             </b-col>
           </b-row>
@@ -143,10 +212,16 @@ to highlight the fields in the custom vocab schema. -->
           <b-row no-gutters>
             <b-col cols="10">
               <div v-if="row.index < customVocabularyUnsaved.length">
-                <b-form-input v-model="row.item.IPA" class="custom-text-field" />
+                <b-form-input
+                  v-model="row.item.IPA"
+                  class="custom-text-field"
+                />
               </div>
               <div v-else>
-                <b-form-input v-model="row.item.IPA" class="custom-text-field text-info" />
+                <b-form-input
+                  v-model="row.item.IPA"
+                  class="custom-text-field text-info"
+                />
               </div>
             </b-col>
           </b-row>
@@ -155,55 +230,120 @@ to highlight the fields in the custom vocab schema. -->
           <b-row no-gutters>
             <b-col cols="9">
               <div v-if="row.index < customVocabularyUnsaved.length">
-                <b-form-input v-model="row.item.display_as" class="custom-text-field" />
+                <b-form-input
+                  v-model="row.item.display_as"
+                  class="custom-text-field"
+                />
               </div>
               <div v-else>
-                <b-form-input v-model="row.item.display_as" class="custom-text-field text-info" />
+                <b-form-input
+                  v-model="row.item.display_as"
+                  class="custom-text-field text-info"
+                />
               </div>
             </b-col>
             <b-col nopadding cols="1">
-              <span style="position:absolute; top: 0px">
-                <b-button v-b-tooltip.hover.right size="sm" style="display: flex;" variant="link" title="Remove row" @click="delete_vocab_row(row.index)">
-                  <b-icon font-scale=".9" icon="x-circle" color="lightgrey"></b-icon>
+              <span style="position: absolute; top: 0px">
+                <b-button
+                  v-b-tooltip.hover.right
+                  size="sm"
+                  style="display: flex"
+                  variant="link"
+                  title="Remove row"
+                  @click="delete_vocab_row(row.index)"
+                >
+                  <b-icon
+                    font-scale=".9"
+                    icon="x-circle"
+                    color="lightgrey"
+                  ></b-icon>
                 </b-button>
               </span>
-              <span style="position:absolute; bottom: 0px">
-                <b-button v-b-tooltip.hover.right size="sm" style="display: flex;" variant="link" title="Add row" @click="add_vocab_row(row.index)">
-                  <b-icon font-scale=".9" icon="plus-square" color="lightgrey"></b-icon>
+              <span style="position: absolute; bottom: 0px">
+                <b-button
+                  v-b-tooltip.hover.right
+                  size="sm"
+                  style="display: flex"
+                  variant="link"
+                  title="Add row"
+                  @click="add_vocab_row(row.index)"
+                >
+                  <b-icon
+                    font-scale=".9"
+                    icon="plus-square"
+                    color="lightgrey"
+                  ></b-icon>
                 </b-button>
               </span>
             </b-col>
           </b-row>
         </template>
       </b-table>
-      <div v-if="customVocabularyUnion.length === 0 && customVocabularyList.length !== 0 && customVocabularySelected === ''" style="color:red">
-        Select an existing vocabulary.<br>
+      <div
+        v-if="
+          customVocabularyUnion.length === 0 &&
+          customVocabularyList.length !== 0 &&
+          customVocabularySelected === ''
+        "
+        style="color: red"
+      >
+        Select an existing vocabulary.<br />
       </div>
-      <div v-if="customVocabularySelected !== '' && customVocabularyFailedReason !== ''" style="color:red">
-        Vocabulary <b>{{ customVocabularySelected }}</b> failed because:<br>
+      <div
+        v-if="
+          customVocabularySelected !== '' && customVocabularyFailedReason !== ''
+        "
+        style="color: red"
+      >
+        Vocabulary <b>{{ customVocabularySelected }}</b> failed because:<br />
         {{ customVocabularyFailedReason }}
       </div>
-      <div v-if="customVocabularyUnion.length === 0 && customVocabularyList.length === 0" style="color:red">
-        Make changes to the subtitles in order to build a custom vocabulary.<br>
+      <div
+        v-if="
+          customVocabularyUnion.length === 0 &&
+          customVocabularyList.length === 0
+        "
+        style="color: red"
+      >
+        Make changes to the subtitles in order to build a custom vocabulary.<br />
       </div>
-      <div v-else-if="validVocabularyName === false" style="color:red">
-        Invalid vocabulary name. Valid characters are a-z, A-Z, and 0-9. Max length is 200.
+      <div v-else-if="validVocabularyName === false" style="color: red">
+        Invalid vocabulary name. Valid characters are a-z, A-Z, and 0-9. Max
+        length is 200.
       </div>
     </b-modal>
-    <b-modal ref="save-modal" ok-title="Confirm" title="Save Captions?" @ok="saveCaptions()">
-      <p>Saving captions will restart a workflow that can take several minutes. You will not be able to edit captions until it has finished. Are you ready to proceed?</p>
+    <b-modal
+      ref="save-modal"
+      ok-title="Confirm"
+      title="Save Captions?"
+      @ok="saveCaptions()"
+    >
+      <p>
+        Saving captions will restart a workflow that can take several minutes.
+        You will not be able to edit captions until it has finished. Are you
+        ready to proceed?
+      </p>
     </b-modal>
-    <b-modal ref="delete-vocab-modal" ok-title="Confirm" ok-variant="danger" title="Delete Vocabulary?" @ok="deleteVocabularyRequest(customVocabularyName=customVocabularySelected)">
-      <p>Are you sure you want to permanently delete the custom vocabulary <b>{{ customVocabularySelected }}</b>?</p>
+    <b-modal
+      ref="delete-vocab-modal"
+      ok-title="Confirm"
+      ok-variant="danger"
+      title="Delete Vocabulary?"
+      @ok="
+        deleteVocabularyRequest(
+          (customVocabularyName = customVocabularySelected)
+        )
+      "
+    >
+      <p>
+        Are you sure you want to permanently delete the custom vocabulary
+        <b>{{ customVocabularySelected }}</b
+        >?
+      </p>
     </b-modal>
     <div v-if="isBusy">
-      <b-spinner
-          variant="secondary"
-          label="Loading..."
-      />
-      <p class="text-muted">
-        (Loading...)
-      </p>
+      <b-spinner variant="secondary" label="Loading..." />
+      <p class="text-muted">(Loading...)</p>
     </div>
     <div v-else-if="noSubtitles === true">
       No transcript found for this asset
@@ -226,31 +366,64 @@ to highlight the fields in the custom vocab schema. -->
               v-for="field in scope.fields"
               :key="field.key"
               :style="{ width: field.key === 'caption' ? '80%' : '20%' }"
-            >
+            />
           </template>
           <!-- reformat timestamp to hh:mm:ss and -->
           <!-- disable timestamp edits if workflow status is not Complete -->
           <template #cell(timeslot)="data">
-            <b-form-input :disabled="workflow_status !== 'Complete'" class="compact-height start-time-field " :value="toHHMMSS(data.item.start)" @change="new_time => changeStartTime(new_time, data.index)" />
-            <b-form-input :disabled="workflow_status !== 'Complete'" class="compact-height stop-time-field " :value="toHHMMSS(data.item.end)" @change="new_time => changeEndTime(new_time, data.index)" />
+            <b-form-input
+              :disabled="workflow_status !== 'Complete'"
+              class="compact-height start-time-field"
+              :value="toHHMMSS(data.item.start)"
+              @change="(new_time) => changeStartTime(new_time, data.index)"
+            />
+            <b-form-input
+              :disabled="workflow_status !== 'Complete'"
+              class="compact-height stop-time-field"
+              :value="toHHMMSS(data.item.end)"
+              @change="(new_time) => changeEndTime(new_time, data.index)"
+            />
           </template>
           <template #cell(caption)="data">
             <b-container class="p-0">
               <b-row no-gutters>
                 <b-col cols="10">
                   <!-- The state on this text area will show a red alert icon
-                  if the user forgets to enter any text. Otherwise we set the
-                  state to null so no validity indicator is shown. -->
-                  <b-form-textarea :id="'caption' + data.index" :ref="'caption' + data.index" :disabled="workflow_status !== 'Complete'" class="custom-text-field .form-control-sm" rows="2" :value="data.item.caption" placeholder="Type subtitle here" :state="(data.item.caption.length > 0) ? null : false" @change="new_caption => changeCaption(new_caption, data.index)" @click="captionClickHandler(data.index)" />
+                            if the user forgets to enter any text. Otherwise we set the
+                            state to null so no validity indicator is shown. -->
+                  <b-form-textarea
+                    :id="'caption' + data.index"
+                    :ref="'caption' + data.index"
+                    :disabled="workflow_status !== 'Complete'"
+                    class="custom-text-field .form-control-sm"
+                    rows="2"
+                    :value="data.item.caption"
+                    placeholder="Type subtitle here"
+                    :state="data.item.caption.length > 0 ? null : false"
+                    @change="
+                      (new_caption) => changeCaption(new_caption, data.index)
+                    "
+                    @click="captionClickHandler(data.index)"
+                  />
                 </b-col>
                 <b-col>
-                  <span style="position:absolute; top: 0px">
-                    <b-button v-if="workflow_status === 'Complete'" size="sm" variant="link" @click="delete_row(data.index)">
+                  <span style="position: absolute; top: 0px">
+                    <b-button
+                      v-if="workflow_status === 'Complete'"
+                      size="sm"
+                      variant="link"
+                      @click="delete_row(data.index)"
+                    >
                       <b-icon icon="x-circle" color="lightgrey"></b-icon>
                     </b-button>
                   </span>
-                  <span style="position:absolute; bottom: 0px">
-                    <b-button v-if="workflow_status === 'Complete'" size="sm" variant="link" @click="add_row(data.index)">
+                  <span style="position: absolute; bottom: 0px">
+                    <b-button
+                      v-if="workflow_status === 'Complete'"
+                      size="sm"
+                      variant="link"
+                      @click="add_row(data.index)"
+                    >
                       <b-icon icon="plus-square" color="lightgrey"></b-icon>
                     </b-button>
                   </span>
@@ -260,41 +433,81 @@ to highlight the fields in the custom vocab schema. -->
           </template>
         </b-table>
       </div>
-      <br>
+      <br />
       <!-- Uncomment to enable Upload button -->
       <!--      <b-button id="showModal" size="sm" class="mb-2" @click="showModal()">-->
       <!--        <b-icon icon="upload" color="white"></b-icon> Upload JSON-->
       <!--      </b-button> &nbsp;-->
       <!-- this is the download button -->
-      <b-dropdown v-if="webCaptions.length > 0" id="download-dropdown" text="Download VTT/SRT" class="mb-2" size="sm" dropup no-caret>
+      <b-dropdown
+        v-if="webCaptions.length > 0"
+        id="download-dropdown"
+        text="Download VTT/SRT"
+        class="mb-2"
+        size="sm"
+        dropup
+        no-caret
+      >
         <template slot="button-content">
           <b-icon icon="download" color="white"></b-icon> Download
         </template>
-        <b-dropdown-item :href="vtt_url">
-          Download VTT
-        </b-dropdown-item>
+        <b-dropdown-item :href="vtt_url"> Download VTT </b-dropdown-item>
         <b-dropdown-item :href="srt_url">
           Download SRT
-        </b-dropdown-item>
-      </b-dropdown>&nbsp;
+        </b-dropdown-item> </b-dropdown
+      >&nbsp;
       <!-- this is the save vocabulary button -->
-      <b-button id="saveVocabulary" v-b-tooltip.hover title="Save vocabulary will open a window where you can create or modify custom vocabularies for AWS Transcribe" size="sm" class="mb-2" @click="showVocabConfirmation()">
+      <b-button
+        id="saveVocabulary"
+        v-b-tooltip.hover
+        title="Save vocabulary will open a window where you can create or modify custom vocabularies for AWS Transcribe"
+        size="sm"
+        class="mb-2"
+        @click="showVocabConfirmation()"
+      >
         <b-icon icon="card-text" color="white"></b-icon>
         Save vocabulary
-      </b-button> &nbsp;
+      </b-button>
+      &nbsp;
       <!-- this is the save edits button for when workflow is paused -->
-      <b-button v-if="workflow_status === 'Waiting'" id="saveCaptions" size="sm" class="mb-2" @click="saveCaptions()">
-        <b-icon v-if="isSaving" icon="arrow-clockwise" animation="spin" color="white"></b-icon>
+      <b-button
+        v-if="workflow_status === 'Waiting'"
+        id="saveCaptions"
+        size="sm"
+        class="mb-2"
+        @click="saveCaptions()"
+      >
+        <b-icon
+          v-if="isSaving"
+          icon="arrow-clockwise"
+          animation="spin"
+          color="white"
+        ></b-icon>
         <b-icon v-else icon="play" color="white"></b-icon>
         Save edits
       </b-button>
       <!-- this is the save edits button for when workflow complete -->
-      <b-button v-if="workflow_status === 'Complete' || workflow_status === 'Error'" id="editCaptions" v-b-tooltip.hover title="Save edits will regenerate the VTT and SRT caption files so they include any changes you may have made to captions." size="sm" class="mb-2" @click="showSaveConfirmation()">
+      <b-button
+        v-if="workflow_status === 'Complete' || workflow_status === 'Error'"
+        id="editCaptions"
+        v-b-tooltip.hover
+        title="Save edits will regenerate the VTT and SRT caption files so they include any changes you may have made to captions."
+        size="sm"
+        class="mb-2"
+        @click="showSaveConfirmation()"
+      >
         <b-icon icon="play" color="white"></b-icon>
         Save edits
       </b-button>
       <!-- this is the save edits button for when workflow running -->
-      <b-button v-if="workflow_status === 'Started'" id="editCaptionsDisabled" size="sm" disabled class="mb-2" @click="saveCaptions()">
+      <b-button
+        v-if="workflow_status === 'Started'"
+        id="editCaptionsDisabled"
+        size="sm"
+        disabled
+        class="mb-2"
+        @click="saveCaptions()"
+      >
         <b-icon icon="arrow-clockwise" animation="spin" color="white"></b-icon>
         Saving edits
       </b-button>
@@ -306,7 +519,15 @@ to highlight the fields in the custom vocab schema. -->
       <!--          <input type="file" @change="uploadCaptionsFile">-->
       <!--        </div>-->
       <!--      </b-modal>-->
-      <div v-if="webCaptions.length > 0 && workflow_status !== 'Complete' && workflow_status !== 'Error' && workflow_status !== 'Waiting'" style="color:red">
+      <div
+        v-if="
+          webCaptions.length > 0 &&
+          workflow_status !== 'Complete' &&
+          workflow_status !== 'Error' &&
+          workflow_status !== 'Waiting'
+        "
+        style="color: red"
+      >
         Editing is disabled until workflow completes.
       </div>
     </div>
@@ -314,8 +535,8 @@ to highlight the fields in the custom vocab schema. -->
 </template>
 
 <script>
-import { mapState } from 'vuex'
-const converter = require('number-to-words');
+import { mapState } from "vuex";
+const converter = require("number-to-words");
 
 export default {
   name: "Subtitles",
@@ -338,7 +559,13 @@ export default {
       vocab_status_polling: null,
       customVocabularyUnsaved: [],
       customVocabularySaved: [],
-      customVocabularyFields: ["original_phrase","new_phrase","sounds_like","IPA","display_as"],
+      customVocabularyFields: [
+        "original_phrase",
+        "new_phrase",
+        "sounds_like",
+        "IPA",
+        "display_as",
+      ],
       customVocabularyList: [],
       customVocabularySelected: "",
       customVocabularyFailedReason: "",
@@ -349,14 +576,14 @@ export default {
       vocabulary_used: "",
       vocabulary_uri: null,
       webCaptions: [],
-      webCaptions_vtt: '',
+      webCaptions_vtt: "",
       vtt_url: null,
       srt_url: null,
       webCaptions_fields: [
-        {key: 'timeslot', label: 'timeslot', tdClass: this.tdClassFunc},
-        {key: 'caption', label: 'caption'}
-        ],
-      uploaded_captions_file: '',
+        { key: "timeslot", label: "timeslot", tdClass: this.tdClassFunc },
+        { key: "caption", label: "caption" },
+      ],
+      uploaded_captions_file: "",
       id: 0,
       transcript: "",
       isBusy: false,
@@ -364,88 +591,98 @@ export default {
       operator: "transcript",
       noSubtitles: false,
       transcribeLanguages: [
-        {text: 'Arabic, Gulf', value: 'ar-AE'},
-        {text: 'Arabic, Modern Standard', value: 'ar-SA'},
-        {text: 'Chinese Mandarin', value: 'zh-CN'},
-        {text: 'Dutch', value: 'nl-NL'},
-        {text: 'English, Australian', value: 'en-AU'},
-        {text: 'English, British', value: 'en-GB'},
-        {text: 'English, Indian-accented', value: 'en-IN'},
-        {text: 'English, Irish', value: 'en-IE'},
-        {text: 'English, Scottish', value: 'en-AB'},
-        {text: 'English, US', value: 'en-US'},
-        {text: 'English, Welsh', value: 'en-WL'},
+        { text: "Arabic, Gulf", value: "ar-AE" },
+        { text: "Arabic, Modern Standard", value: "ar-SA" },
+        { text: "Chinese Mandarin", value: "zh-CN" },
+        { text: "Dutch", value: "nl-NL" },
+        { text: "English, Australian", value: "en-AU" },
+        { text: "English, British", value: "en-GB" },
+        { text: "English, Indian-accented", value: "en-IN" },
+        { text: "English, Irish", value: "en-IE" },
+        { text: "English, Scottish", value: "en-AB" },
+        { text: "English, US", value: "en-US" },
+        { text: "English, Welsh", value: "en-WL" },
         // Disabled until 'fa' supported by AWS Translate
         // {text: 'Farsi', value: 'fa-IR'},
-        {text: 'French', value: 'fr-FR'},
-        {text: 'French, Canadian', value: 'fr-CA'},
-        {text: 'German', value: 'de-DE'},
-        {text: 'German, Swiss', value: 'de-CH'},
-        {text: 'Hebrew', value: 'he-IL'},
-        {text: 'Hindi', value: 'hi-IN'},
-        {text: 'Indonesian', value: 'id-ID'},
-        {text: 'Italian', value: 'it-IT'},
-        {text: 'Japanese', value: 'ja-JP'},
-        {text: 'Korean', value: 'ko-KR'},
-        {text: 'Malay', value: 'ms-MY'},
-        {text: 'Portuguese', value: 'pt-PT'},
-        {text: 'Portuguese, Brazilian', value: 'pt-BR'},
-        {text: 'Russian', value: 'ru-RU'},
-        {text: 'Spanish', value: 'es-ES'},
-        {text: 'Spanish, US', value: 'es-US'},
-        {text: 'Tamil', value: 'ta-IN'},
+        { text: "French", value: "fr-FR" },
+        { text: "French, Canadian", value: "fr-CA" },
+        { text: "German", value: "de-DE" },
+        { text: "German, Swiss", value: "de-CH" },
+        { text: "Hebrew", value: "he-IL" },
+        { text: "Hindi", value: "hi-IN" },
+        { text: "Indonesian", value: "id-ID" },
+        { text: "Italian", value: "it-IT" },
+        { text: "Japanese", value: "ja-JP" },
+        { text: "Korean", value: "ko-KR" },
+        { text: "Malay", value: "ms-MY" },
+        { text: "Portuguese", value: "pt-PT" },
+        { text: "Portuguese, Brazilian", value: "pt-BR" },
+        { text: "Russian", value: "ru-RU" },
+        { text: "Spanish", value: "es-ES" },
+        { text: "Spanish, US", value: "es-US" },
+        { text: "Tamil", value: "ta-IN" },
         // Disabled until 'te' supported by AWS Translate
         // {text: 'Telugu', value: 'te-IN'},
-        {text: 'Turkish', value: 'tr-TR'},
-      ]
-    }
+        { text: "Turkish", value: "tr-TR" },
+      ],
+    };
   },
   computed: {
-    customVocabularyUnion: function() {
-      return this.customVocabularyUnsaved.concat(this.customVocabularySaved)
+    customVocabularyUnion: function () {
+      return this.customVocabularyUnsaved.concat(this.customVocabularySaved);
     },
-    validVocabularyName: function() {
+    validVocabularyName: function () {
       const letterNumber = /^[0-9a-zA-Z]+$/;
       // The name can be up to 200 characters long. Valid characters are a-z, A-Z, and 0-9.
-      if (this.customVocabularyCreateNew === "" || (this.customVocabularyCreateNew.match(letterNumber) && this.customVocabularyCreateNew.length<200)) {
+      if (
+        this.customVocabularyCreateNew === "" ||
+        (this.customVocabularyCreateNew.match(letterNumber) &&
+          this.customVocabularyCreateNew.length < 200)
+      ) {
         return true;
-      }
-      else
-      {
+      } else {
         return false;
       }
     },
     customVocabularyName: function () {
       if (this.customVocabularyCreateNew !== "")
-        return this.customVocabularyCreateNew
-      else
-        return this.customVocabularySelected
+        return this.customVocabularyCreateNew;
+      else return this.customVocabularySelected;
     },
     customVocabularyFile: function () {
-      let customVocabularyUnion = this.customVocabularyUnion
+      let customVocabularyUnion = this.customVocabularyUnion;
       for (const i in customVocabularyUnion) {
         if (customVocabularyUnion[i].new_phrase === undefined)
-          customVocabularyUnion[i].new_phrase = ""
+          customVocabularyUnion[i].new_phrase = "";
         if (customVocabularyUnion[i].sounds_like === undefined)
-          customVocabularyUnion[i].sounds_like = ""
+          customVocabularyUnion[i].sounds_like = "";
         if (customVocabularyUnion[i].IPA === undefined)
-          customVocabularyUnion[i].IPA = ""
+          customVocabularyUnion[i].IPA = "";
         if (customVocabularyUnion[i].display_as === undefined)
-          customVocabularyUnion[i].display_as = ""
+          customVocabularyUnion[i].display_as = "";
       }
 
-      let vocab_file = "Phrase\tSoundsLike\tIPA\tDisplayAs"
+      let vocab_file = "Phrase\tSoundsLike\tIPA\tDisplayAs";
       for (const i in customVocabularyUnion) {
-        vocab_file += "\n" + customVocabularyUnion[i].new_phrase + "\t" + customVocabularyUnion[i].sounds_like + "\t" + customVocabularyUnion[i].IPA + "\t" + customVocabularyUnion[i].display_as
+        vocab_file +=
+          "\n" +
+          customVocabularyUnion[i].new_phrase +
+          "\t" +
+          customVocabularyUnion[i].sounds_like +
+          "\t" +
+          customVocabularyUnion[i].IPA +
+          "\t" +
+          customVocabularyUnion[i].display_as;
       }
-      console.log("vocabulary file")
-      console.log(vocab_file)
-      return vocab_file
+      console.log("vocabulary file");
+      console.log(vocab_file);
+      return vocab_file;
     },
     inputListeners: function () {
-      var vm = this
+      var vm = this;
       // `Object.assign` merges objects together to form a new object
-      return Object.assign({},
+      return Object.assign(
+        {},
         // We add all the listeners from the parent
         this.$listeners,
         // Then we can add custom listeners or override the
@@ -453,12 +690,16 @@ export default {
         {
           // This ensures that the component works with v-model
           input: function (event) {
-            vm.$emit('input', event.target.value)
-          }
+            vm.$emit("input", event.target.value);
+          },
         }
-      )
+      );
     },
-    ...mapState(['player', 'waveform_seek_position', 'unsaved_custom_vocabularies']),
+    ...mapState([
+      "player",
+      "waveform_seek_position",
+      "unsaved_custom_vocabularies",
+    ]),
   },
   watch: {
     // When user moves the cursor on the waveform
@@ -467,28 +708,29 @@ export default {
       this.handleWaveformSeek();
     },
     // when user begins typing new vocab name, then deselect the radio buttons
-    customVocabularyCreateNew: function() {
-      this.customVocabularySelected = ""
+    customVocabularyCreateNew: function () {
+      this.customVocabularySelected = "";
     },
-    customVocabularySelected: async function() {
+    customVocabularySelected: async function () {
       // Remove phrases from the previously selected vocabulary
       // before we add phrases from the newly selected vocabulary.
       if (this.customVocabularySelected !== "") {
         // update the vocabulary language shown in the web form.
-        this.vocabulary_language_code = this.customVocabularyList.filter(item => (item.name === this.customVocabularySelected))[0].language_code
+        this.vocabulary_language_code = this.customVocabularyList.filter(
+          (item) => item.name === this.customVocabularySelected
+        )[0].language_code;
         // add phrases from the selected vocabulary
-        await this.downloadVocabulary()
-        await this.getCustomVocabularyFailedReason()
+        await this.downloadVocabulary();
+        await this.getCustomVocabularyFailedReason();
       }
-
-    }
+    },
   },
   deactivated: function () {
     this.noSubtitles = false;
-    console.log('deactivated component:', this.operator)
+    console.log("deactivated component:", this.operator);
   },
   activated: function () {
-    console.log('activated component:', this.operator);
+    console.log("activated component:", this.operator);
     this.isBusy = true;
     this.handleVideoPlay();
     this.handleVideoSeek();
@@ -496,278 +738,337 @@ export default {
     this.getAssetWorkflowStatus();
   },
   beforeDestroy: function () {
-    this.transcript = ''
-    clearInterval(this.workflow_status_polling)
-    clearInterval(this.vocab_status_polling)
+    this.transcript = "";
+    clearInterval(this.workflow_status_polling);
+    clearInterval(this.vocab_status_polling);
   },
   methods: {
     getVttCaptions: async function () {
       const asset_id = this.$route.params.asset_id;
-      let apiName = 'mieDataplaneApi'
-      let path = 'metadata/' + asset_id + '/WebToVTTCaptions'
+      let apiName = "mieDataplaneApi";
+      let path = "metadata/" + asset_id + "/WebToVTTCaptions";
       let requestOpts = {
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        response: true
+        response: true,
       };
       try {
-        let transcribed_language = this.transcribe_language_code.split('-')[0]
+        let transcribed_language = this.transcribe_language_code.split("-")[0];
         let response = await this.$Amplify.API.get(apiName, path, requestOpts);
-        let source_language_caption = response.data.results.CaptionsCollection.filter(item => {return item.LanguageCode === transcribed_language;})[0];
+        let source_language_caption =
+          response.data.results.CaptionsCollection.filter((item) => {
+            return item.LanguageCode === transcribed_language;
+          })[0];
         const bucket = source_language_caption.Results.S3Bucket;
         const key = source_language_caption.Results.S3Key;
         // get URL to captions file in S3
-        path = 'download'
+        path = "download";
         requestOpts = {
           headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
           },
           body: {
-            "S3Bucket": bucket,
-            "S3Key": key
+            S3Bucket: bucket,
+            S3Key: key,
           },
           response: true,
-          responseType: 'text'
+          responseType: "text",
         };
 
         try {
           let res = await this.$Amplify.API.post(apiName, path, requestOpts);
           // record the signed urls in an array
-          this.vtt_url = res.data
-        } catch  (error){
-          console.error(error)
+          this.vtt_url = res.data;
+        } catch (error) {
+          console.error(error);
         }
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
     },
     getSrtCaptions: async function () {
       const asset_id = this.$route.params.asset_id;
-      let apiName = 'mieDataplaneApi'
-      let path = 'metadata/' + asset_id + '/WebToSRTCaptions'
+      let apiName = "mieDataplaneApi";
+      let path = "metadata/" + asset_id + "/WebToSRTCaptions";
       let requestOpts = {
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        response: true
+        response: true,
       };
       try {
-        let transcribed_language = this.transcribe_language_code.split('-')[0]
+        let transcribed_language = this.transcribe_language_code.split("-")[0];
         let response = await this.$Amplify.API.get(apiName, path, requestOpts);
-        let source_language_caption = response.data.results.CaptionsCollection.filter(item => {return item.LanguageCode === transcribed_language;})[0];
+        let source_language_caption =
+          response.data.results.CaptionsCollection.filter((item) => {
+            return item.LanguageCode === transcribed_language;
+          })[0];
         const bucket = source_language_caption.Results.S3Bucket;
         const key = source_language_caption.Results.S3Key;
         // get URL to captions file in S3
-        path = 'download'
+        path = "download";
         requestOpts = {
           headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
           },
           body: {
-            "S3Bucket": bucket,
-            "S3Key": key
+            S3Bucket: bucket,
+            S3Key: key,
           },
           response: true,
-          responseType: 'text'
+          responseType: "text",
         };
         try {
           let res = await this.$Amplify.API.post(apiName, path, requestOpts);
-          this.srt_url = res.data
-        } catch  (error){
-          console.error(error)
+          this.srt_url = res.data;
+        } catch (error) {
+          console.error(error);
         }
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
     },
-    getCustomVocabularyFailedReason: async function() {
+    getCustomVocabularyFailedReason: async function () {
       if (this.customVocabularySelected !== "") {
+        console.log(
+          "Getting failed vocabulary details for " +
+            this.customVocabularySelected
+        );
 
-        console.log("Getting failed vocabulary details for " + this.customVocabularySelected)
-
-        let apiName = 'mieWorkflowApi'
-        let path = 'service/transcribe/get_vocabulary'
-        let body = {"vocabulary_name": this.customVocabularySelected}
+        let apiName = "mieWorkflowApi";
+        let path = "service/transcribe/get_vocabulary";
+        let body = { vocabulary_name: this.customVocabularySelected };
         let requestOpts = {
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: body,
-            response: true
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: body,
+          response: true,
         };
 
         try {
-          let response = await this.$Amplify.API.post(apiName, path, requestOpts);
+          let response = await this.$Amplify.API.post(
+            apiName,
+            path,
+            requestOpts
+          );
 
           if (response.status === 200) {
-            console.log("Failed vocabulary details:")
-            console.log(response.data)
+            console.log("Failed vocabulary details:");
+            console.log("859", response.data);
             if ("FailureReason" in response.data) {
               // Transcribe's failure reason will reference a line number that
               // is 1 too high. We decrement that line number by 1 here so it
               // lines up with the custom vocabulary table.
-              let failure_reason = response.data["FailureReason"].split("error: ")[1]
-              let error_text_part_1 = failure_reason.split("Error at line")[0]
-              let error_text_part_2 = "Error at line " + failure_reason.split("Error at line")[1].replace(/[0-9]+(?!.*[0-9])/, function(line_number) { return line_number-1 })
-              this.customVocabularyFailedReason = error_text_part_1 + error_text_part_2
+              let failure_reason =
+                response.data["FailureReason"].split("error: ")[1];
+              let error_text_part_1 = failure_reason.split("Error at line")[0];
+              let error_text_part_2 =
+                "Error at line " +
+                failure_reason
+                  .split("Error at line")[1]
+                  .replace(/[0-9]+(?!.*[0-9])/, function (line_number) {
+                    return line_number - 1;
+                  });
+              this.customVocabularyFailedReason =
+                error_text_part_1 + error_text_part_2;
             } else {
-              this.customVocabularyFailedReason = ''
+              this.customVocabularyFailedReason = "";
             }
           }
-
         } catch (error) {
-          this.customVocabularyFailedReason = ""
-          console.log(error)
+          this.customVocabularyFailedReason = "";
+          console.log(error);
         }
       } else {
-        this.customVocabularyFailedReason = ""
+        this.customVocabularyFailedReason = "";
       }
     },
     toHHMMSS(secs) {
-      var sec_num = parseInt(secs, 10)
-      var hours   = Math.floor(sec_num / 3600)
-      var minutes = Math.floor(sec_num / 60) % 60
-      var seconds = sec_num % 60
+      var sec_num = parseInt(secs, 10);
+      var hours = Math.floor(sec_num / 3600);
+      var minutes = Math.floor(sec_num / 60) % 60;
+      var seconds = sec_num % 60;
 
-      return [hours,minutes,seconds]
-        .map(v => v < 10 ? "0" + v : v)
-        .filter((v,i) => v !== "00" || i > 0)
-        .join(":")
+      return [hours, minutes, seconds]
+        .map((v) => (v < 10 ? "0" + v : v))
+        .filter((v, i) => v !== "00" || i > 0)
+        .join(":");
     },
     sortWebCaptions(item) {
-      console.log("sorting captions")
+      console.log("sorting captions");
       // Keep the webCaptions table sorted on caption start time
-      this.webCaptions.sort((a,b) => {
-        a=parseFloat(a["start"])
-        b=parseFloat(b["start"])
-        return a<b?-1:1
+      this.webCaptions.sort((a, b) => {
+        a = parseFloat(a["start"]);
+        b = parseFloat(b["start"]);
+        return a < b ? -1 : 1;
       });
       if (item) {
         // Since table has mutated, regain focus on the row that the user is editing
-        const new_index = this.webCaptions.findIndex(element => {
-          return (element.start === item.start)
-        })
-        this.$refs["caption" + (new_index)].focus();
+        const new_index = this.webCaptions.findIndex((element) => {
+          return element.start === item.start;
+        });
+        this.$refs["caption" + new_index].focus();
       }
     },
     changeStartTime(hms, index) {
       // input time must be in hh:mm:ss or mm:ss format
-      let new_time = hms.split(':').reduce((acc,time) => (60 * acc) + +time);
-      this.webCaptions[index].start = new_time
-      this.sortWebCaptions(this.webCaptions[index])
+      let new_time = hms.split(":").reduce((acc, time) => 60 * acc + +time);
+      this.webCaptions[index].start = new_time;
+      this.sortWebCaptions(this.webCaptions[index]);
     },
     changeEndTime(hms, index) {
       // input time must be in hh:mm:ss or mm:ss format
-      let new_time = hms.split(':').reduce((acc,time) => (60 * acc) + +time);
-      this.webCaptions[index].end = new_time
+      let new_time = hms.split(":").reduce((acc, time) => 60 * acc + +time);
+      this.webCaptions[index].end = new_time;
     },
     changeCaption(new_caption, index) {
       // We're using the diff package to determine what words were added or removed from the subtitles
-      const Diff = require('diff');
+      const Diff = require("diff");
       const diff = Diff.diffWords(this.webCaptions[index].caption, new_caption);
       // Diff returns a dictionary that contains "added" or "removed" keys for words
       // which were added or removed. So, we'll look for those keys now:
-      console.log("Caption edit:")
-      console.log(diff)
-      let old_phrase = ''
-      let new_phrase = ''
-      let next_word = ''
-      for (let i=0; i<=(diff.length-1); i++) {
+      console.log("Caption edit:");
+      console.log(diff);
+      let old_phrase = "";
+      let new_phrase = "";
+      let next_word = "";
+      for (let i = 0; i <= diff.length - 1; i++) {
         // If element contains key removed
         if ("removed" in diff[i] && diff[i].removed !== undefined) {
-          old_phrase += diff[i].value+' '
+          old_phrase += diff[i].value + " ";
         }
         // If element contains key added
         else if ("added" in diff[i] && diff[i].added !== undefined) {
-          new_phrase += diff[i].value+' '
+          new_phrase += diff[i].value + " ";
         }
         // If the element is the last element and
         // does not contain "removed" or "added" keys, then it
         // contains the text that follows the edited phrase.
         else if (i === diff.length - 1) {
-          next_word = diff[i].value.trim().split(" ")[0]
-          console.log("next word: " + next_word)
+          next_word = diff[i].value.trim().split(" ")[0];
+          console.log("next word: " + next_word);
         }
         // otherwise if element is just words, or if it's the last element,
         // then save word change to custom vocabulary
-        if (i === (diff.length-1) || !("added" in diff[i] || "removed" in diff[i])) {
+        if (
+          i === diff.length - 1 ||
+          !("added" in diff[i] || "removed" in diff[i])
+        ) {
           // if this value is a space and next value contains key 'added',
           // then break so that we can add that value to the new_phrase
-          if (i !== (diff.length-1) && diff[i].value === ' ' && "added" in diff[i+1] && diff[i+1].added !== 'undefined') {
-            continue
+          if (
+            i !== diff.length - 1 &&
+            diff[i].value === " " &&
+            "added" in diff[i + 1] &&
+            diff[i + 1].added !== "undefined"
+          ) {
+            continue;
           } else {
             // or if this is the last element
             // or if this value is anything other than a space
             // then save to custom vocabulary
-            if (old_phrase != '' && new_phrase != '') {
+            if (old_phrase != "" && new_phrase != "") {
               // replace multiple spaces with a single space
               // and remove spaces at beginning or end of word
-              old_phrase = old_phrase.replace(/ +(?= )/g, '').trim();
-              new_phrase = new_phrase.replace(/ +(?= )/g, '').trim();
+              old_phrase = old_phrase.replace(/ +(?= )/g, "").trim();
+              new_phrase = new_phrase.replace(/ +(?= )/g, "").trim();
               // If the edited phrase ends with a apostrophe or a hyphen,
               // then we'll concatenate that phrase with the first word in
               // the text that follows the edited phrase. We need to do this
               // because the custom vocabulary will fail to save if it
               // contains any phrases that end with an apostrophe or a hyphen.
               if (new_phrase.slice(-1).match(/[',-]/i)) {
-                new_phrase = new_phrase + next_word
+                new_phrase = new_phrase + next_word;
               }
               // Transcribe requires numbers to be spelled out in the phrase field.
               // Transcribe also requires spaces to be dashes in the phrase field.
               // So we make those changes here:
-              let new_phrase_with_numbers_as_words = this.phrase_formatter(new_phrase)
+              let new_phrase_with_numbers_as_words =
+                this.phrase_formatter(new_phrase);
               // remove old_phrase from custom vocab, if it already exists
-              this.customVocabularyUnsaved = this.customVocabularyUnsaved.filter(item => {return item.original_phrase !== old_phrase;});
+              this.customVocabularyUnsaved =
+                this.customVocabularyUnsaved.filter((item) => {
+                  return item.original_phrase !== old_phrase;
+                });
               // add old_phrase to custom vocab
-              this.customVocabularyUnsaved.push({"original_phrase": old_phrase, "new_phrase": new_phrase_with_numbers_as_words, "sounds_like":"", "IPA":"", "display_as": new_phrase})
-              console.log("CUSTOM VOCABULARY: " + JSON.stringify(this.customVocabularyUnsaved))
+              this.customVocabularyUnsaved.push({
+                original_phrase: old_phrase,
+                new_phrase: new_phrase_with_numbers_as_words,
+                sounds_like: "",
+                IPA: "",
+                display_as: new_phrase,
+              });
+              console.log(
+                "CUSTOM VOCABULARY: " +
+                  JSON.stringify(this.customVocabularyUnsaved)
+              );
             }
-            old_phrase = ''
-            new_phrase = ''
+            old_phrase = "";
+            new_phrase = "";
           }
         }
       }
-      this.webCaptions[index].caption = new_caption
+      this.webCaptions[index].caption = new_caption;
     },
     captionClickHandler(index) {
       // pause video player and jump to the time for the selected caption
-      this.player.currentTime(this.webCaptions[index].start)
-      this.player.pause()
+      this.player.currentTime(this.webCaptions[index].start);
+      this.player.pause();
     },
     // Format a VTT timestamp in HH:MM:SS.mmm
     formatTimeVTT(timeSeconds) {
-      const ONE_HOUR = 60 * 60
-      const ONE_MINUTE = 60
-      const hours = Math.floor(timeSeconds / ONE_HOUR)
-      let remainder = timeSeconds - (hours * ONE_HOUR)
-      const minutes = Math.floor(remainder / 60)
-      remainder = remainder - (minutes * ONE_MINUTE)
-      const seconds = Math.floor(remainder)
-      remainder = remainder - seconds
-      const millis = remainder
+      const ONE_HOUR = 60 * 60;
+      const ONE_MINUTE = 60;
+      const hours = Math.floor(timeSeconds / ONE_HOUR);
+      let remainder = timeSeconds - hours * ONE_HOUR;
+      const minutes = Math.floor(remainder / 60);
+      remainder = remainder - minutes * ONE_MINUTE;
+      const seconds = Math.floor(remainder);
+      remainder = remainder - seconds;
+      const millis = remainder;
 
-      return hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0') + '.' + Math.floor(millis * 1000).toString().padStart(3, '0')
+      return (
+        hours.toString().padStart(2, "0") +
+        ":" +
+        minutes.toString().padStart(2, "0") +
+        ":" +
+        seconds.toString().padStart(2, "0") +
+        "." +
+        Math.floor(millis * 1000)
+          .toString()
+          .padStart(3, "0")
+      );
     },
     webToVtt() {
-      let vtt = 'WEBVTT\n\n'
+      let vtt = "WEBVTT\n\n";
       for (let i = 0; i < this.webCaptions.length; i++) {
-        const caption = this.webCaptions[i]
-        vtt += this.formatTimeVTT(caption["start"]) + ' --> ' + this.formatTimeVTT(caption["end"]) + '\n';
-        vtt += caption["caption"] + '\n\n';
+        const caption = this.webCaptions[i];
+        vtt +=
+          this.formatTimeVTT(caption["start"]) +
+          " --> " +
+          this.formatTimeVTT(caption["end"]) +
+          "\n";
+        vtt += caption["caption"] + "\n\n";
       }
       this.webCaptions_vtt = vtt;
     },
     handleWaveformSeek() {
       // When user moves the cursor on the waveform
       // then focus the corresponding row in the caption table.
-      let timeline_position = this.webCaptions.findIndex(function (item) {
-        return (parseInt(item.start) <= this.waveform_seek_position && parseInt(item.end) >= this.waveform_seek_position)
-      }.bind(this));
+      let timeline_position = this.webCaptions.findIndex(
+        function (item) {
+          return (
+            parseInt(item.start) <= this.waveform_seek_position &&
+            parseInt(item.end) >= this.waveform_seek_position
+          );
+        }.bind(this)
+      );
       if (timeline_position === -1) {
         // There is no caption at that seek position
         // so just seek to the beginning.
-        timeline_position = 0
+        timeline_position = 0;
       }
       if (this.$refs.selectableTable) {
         var element = document.getElementById("caption" + timeline_position);
@@ -778,40 +1079,56 @@ export default {
       // When user moves the cursor on the video player
       // then focus the corresponding row in the caption table.
       if (this.player) {
-        this.player.controlBar.progressControl.on('mouseup', function () {
-          const current_position = Math.round(this.player.currentTime());
-          let timeline_position = this.webCaptions.findIndex(function (item) {
-            return (parseInt(item.start) <= current_position && parseInt(item.end) >= current_position)
-          })
-          if (timeline_position === -1) {
-            // There is no caption at that seek position
-            // so just seek to the beginning.
-            timeline_position = 0
-          }
-          if (this.$refs.selectableTable) {
-            var element = document.getElementById("caption" + (timeline_position));
-            element.scrollIntoView();
-          }
-        }.bind(this));
+        this.player.controlBar.progressControl.on(
+          "mouseup",
+          function () {
+            const current_position = Math.round(this.player.currentTime());
+            let timeline_position = this.webCaptions.findIndex(function (item) {
+              return (
+                parseInt(item.start) <= current_position &&
+                parseInt(item.end) >= current_position
+              );
+            });
+            if (timeline_position === -1) {
+              // There is no caption at that seek position
+              // so just seek to the beginning.
+              timeline_position = 0;
+            }
+            if (this.$refs.selectableTable) {
+              var element = document.getElementById(
+                "caption" + timeline_position
+              );
+              element.scrollIntoView();
+            }
+          }.bind(this)
+        );
       }
     },
     handleVideoPlay() {
       var last_position = 0;
       // Advance the selected row in the caption table when the video is playing
-      this.player.on('timeupdate', function () {
-        const current_position = Math.round(this.player.currentTime());
-        if (current_position !== last_position) {
-          let timeline_position = this.webCaptions.findIndex(function(item){return (parseInt(item.start) <= current_position && parseInt(item.end) >= current_position)})
-          if (this.$refs.selectableTable) {
-            this.$refs.selectableTable.selectRow(timeline_position)
+      this.player.on(
+        "timeupdate",
+        function () {
+          const current_position = Math.round(this.player.currentTime());
+          if (current_position !== last_position) {
+            let timeline_position = this.webCaptions.findIndex(function (item) {
+              return (
+                parseInt(item.start) <= current_position &&
+                parseInt(item.end) >= current_position
+              );
+            });
+            if (this.$refs.selectableTable) {
+              this.$refs.selectableTable.selectRow(timeline_position);
+            }
+            last_position = current_position;
           }
-          last_position = current_position;
-        }
-      }.bind(this));
+        }.bind(this)
+      );
     },
-    getWorkflowId: async function() {
-      let apiName = 'mieWorkflowApi'
-      let path = 'workflow/execution/asset/' + this.asset_id
+    getWorkflowId: async function () {
+      let apiName = "mieWorkflowApi";
+      let path = "workflow/execution/asset/" + this.asset_id;
       let requestOpts = {
         response: true,
       };
@@ -821,212 +1138,250 @@ export default {
         const workflows = response.data;
         // The original workflow is the oldest one. This is the one that has results
         // from Transcibe and Caption operators.
-        const original_workflow = workflows.sort(function(a, b) {return a.Created - b.Created;})[0];
-        const latest_workflow = workflows.sort(function(a, b) {return a.Created - b.Created;}).slice(-1)[0];
-        const original_workflow_id = original_workflow.Id
-        this.workflow_id = latest_workflow.Id
-        this.workflow_status = latest_workflow.Status
+        const original_workflow = workflows.sort(function (a, b) {
+          return a.Created - b.Created;
+        })[0];
+        const latest_workflow = workflows
+          .sort(function (a, b) {
+            return a.Created - b.Created;
+          })
+          .slice(-1)[0];
+        const original_workflow_id = original_workflow.Id;
+        this.workflow_id = latest_workflow.Id;
+        this.workflow_status = latest_workflow.Status;
         if ("CurrentStage" in latest_workflow)
-          this.waiting_stage = latest_workflow.CurrentStage
-        this.getTranscribeLanguage(original_workflow_id)
+          this.waiting_stage = latest_workflow.CurrentStage;
+        this.getTranscribeLanguage(original_workflow_id);
         // get workflow config, needed for edit captions button
         this.getWorkflowConfig(original_workflow_id);
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
-
     },
-    getAssetWorkflowStatus: async function() {
-      let apiName = 'mieWorkflowApi'
-      let path =  "workflow/execution/asset/" + this.asset_id
+    getAssetWorkflowStatus: async function () {
+      let apiName = "mieWorkflowApi";
+      let path = "workflow/execution/asset/" + this.asset_id;
       let requestOpts = {
         headers: {},
         response: true,
-        queryStringParameters: {} // optional
+        queryStringParameters: {}, // optional
       };
       try {
         let response = await this.$Amplify.API.get(apiName, path, requestOpts);
-        this.workflow_status = response.data[0].Status
+        this.workflow_status = response.data[0].Status;
       } catch (error) {
         console.log("ERROR: Failed to get workflow status");
-        console.log(error)
+        console.log(error);
       }
     },
-    getTranscribeLanguage: async function(workflow_id) {
-      let apiName = 'mieWorkflowApi'
-      let path =  "workflow/execution/" + workflow_id
+    getTranscribeLanguage: async function (workflow_id) {
+      let apiName = "mieWorkflowApi";
+      let path = "workflow/execution/" + workflow_id;
       let requestOpts = {
         headers: {},
         response: true,
-        queryStringParameters: {} // optional
+        queryStringParameters: {}, // optional
       };
       try {
         let response = await this.$Amplify.API.get(apiName, path, requestOpts);
-        console.log(response.data)
-        const operator_info = []
-        if ("TranscribeSourceLanguage" in response.data.Globals.MetaData) { 
-          this.sourceLanguageCode = response.data.Globals.MetaData.TranscribeSourceLanguage.split('-')[0]
-          this.transcribe_language_code = response.data.Globals.MetaData.TranscribeSourceLanguage
-          this.vocabulary_language_code = this.transcribe_language_code
-          this.vocabulary_used = response.data.Configuration.AnalyzeVideo.TranscribeVideo.VocabularyName
-          const transcribe_language = this.transcribeLanguages.filter(x => (x.value === this.transcribe_language_code))[0].text;
-          operator_info.push({"name": "Source Language", "value": transcribe_language})
+        const operator_info = [];
+        console.log("1188", response.data);
+        console.log(
+          "response.data.Configuration.Translate.TranslateWebCaptions.SourceLanguageCode",
+          response.data.Configuration.Translate.TranslateWebCaptions
+            .SourceLanguageCode
+        );
+        this.sourceLanguageCode =
+          response.data.Configuration.Translate.TranslateWebCaptions.SourceLanguageCode;
+
+        if ("TranscribeSourceLanguage" in response.data.Globals.MetaData) {
+          this.sourceLanguageCode =
+            response.data.Globals.MetaData.TranscribeSourceLanguage.split(
+              "-"
+            )[0];
+          this.transcribe_language_code =
+            response.data.Globals.MetaData.TranscribeSourceLanguage;
+          this.vocabulary_language_code = this.transcribe_language_code;
+          this.vocabulary_used =
+            response.data.Configuration.AnalyzeVideo.TranscribeVideo.VocabularyName;
+          const transcribe_language = this.transcribeLanguages.filter(
+            (x) => x.value === this.transcribe_language_code
+          )[0].text;
+          operator_info.push({
+            name: "Source Language",
+            value: transcribe_language,
+          });
           if (this.vocabulary_used) {
-            operator_info.push({"name": "Custom Vocabulary", "value": this.vocabulary_used})
+            operator_info.push({
+              name: "Custom Vocabulary",
+              value: this.vocabulary_used,
+            });
           }
         }
-        this.language_model_used = response.data.Configuration.AnalyzeVideo.TranscribeVideo.LanguageModelName
+        this.language_model_used =
+          response.data.Configuration.AnalyzeVideo.TranscribeVideo.LanguageModelName;
         if (this.language_model_used) {
-          operator_info.push({"name": "Custom Language Model", "value": this.language_model_used})
+          operator_info.push({
+            name: "Custom Language Model",
+            value: this.language_model_used,
+          });
         }
-        this.$store.commit('updateOperatorInfo', operator_info)
-        this.getWebCaptions()
-        this.getVttCaptions()
-        this.getSrtCaptions()
+        this.$store.commit("updateOperatorInfo", operator_info);
+        this.getWebCaptions();
+        this.getVttCaptions();
+        this.getSrtCaptions();
       } catch (error) {
         console.log("ERROR: Failed to get transcribe language");
-        console.log(error)
+        console.log(error);
       }
     },
-    downloadVocabulary: async function() {
-      let apiName = 'mieWorkflowApi'
-      let path = 'service/transcribe/download_vocabulary'
+    downloadVocabulary: async function () {
+      let apiName = "mieWorkflowApi";
+      let path = "service/transcribe/download_vocabulary";
       let requestOpts = {
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: {"vocabulary_name":this.customVocabularySelected},
-          response: true
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: { vocabulary_name: this.customVocabularySelected },
+        response: true,
       };
 
-      this.customVocabularySaved = []
-      this.customVocabularyFailedReason = ""
+      this.customVocabularySaved = [];
+      this.customVocabularyFailedReason = "";
 
       try {
         let response = await this.$Amplify.API.post(apiName, path, requestOpts);
-        if(response.status == 200) {
+        if (response.status == 200) {
           // save phrases from the currently selected vocabulary
-          this.customVocabularySaved = response.data.vocabulary.map(item => ({
+          this.customVocabularySaved = response.data.vocabulary.map((item) => ({
             original_phrase: "",
             new_phrase: item["Phrase"],
             sounds_like: item["SoundsLike"],
-            display_as: item["DisplayAs\r"]
+            display_as: item["DisplayAs\r"],
           }));
         } else {
-          console.log("WARNING: Could not download vocabulary. Loading vocab from vuex state...")
-          this.customVocabularySaved = this.unsaved_custom_vocabularies.filter(item => (item.Name === this.customVocabularySelected))[0].vocabulary
+          console.log(
+            "WARNING: Could not download vocabulary. Loading vocab from vuex state..."
+          );
+          this.customVocabularySaved = this.unsaved_custom_vocabularies.filter(
+            (item) => item.Name === this.customVocabularySelected
+          )[0].vocabulary;
         }
       } catch (error) {
-        alert(
-          "ERROR: Failed to get vocabularies."
-        );
-        console.log(error)
+        alert("ERROR: Failed to get vocabularies.");
+        console.log(error);
       }
     },
-    getWorkflowConfig: async function(workflow_id) {
-      let apiName = 'mieWorkflowApi'
-      let path = 'workflow/execution/' + workflow_id
+    getWorkflowConfig: async function (workflow_id) {
+      let apiName = "mieWorkflowApi";
+      let path = "workflow/execution/" + workflow_id;
       let requestOpts = {
         response: true,
       };
       try {
         let response = await this.$Amplify.API.get(apiName, path, requestOpts);
-        this.workflow_config = response.data.Configuration
-        this.workflow_definition = response.data.Workflow
+        this.workflow_config = response.data.Configuration;
+        this.workflow_definition = response.data.Workflow;
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
-
     },
-    resumeWorkflow: async function() {
+    resumeWorkflow: async function () {
       // This function executes a paused workflow from the WaitingStageName stage.
-      let apiName = 'mieWorkflowApi'
-      let path = 'workflow/execution/' + this.workflow_id
-      const data = JSON.stringify({"WaitingStageName": this.waiting_stage});
+      let apiName = "mieWorkflowApi";
+      let path = "workflow/execution/" + this.workflow_id;
+      const data = JSON.stringify({ WaitingStageName: this.waiting_stage });
       let requestOpts = {
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: data,
-          response: true
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: data,
+        response: true,
       };
 
       try {
         let response = await this.$Amplify.API.put(apiName, path, requestOpts);
         if (response.status === 200) {
-            console.log("Workflow resumed")
-            this.saveNotificationMessage += " and workflow resumed"
-            this.pollWorkflowStatus()
-          }
+          console.log("Workflow resumed");
+          this.saveNotificationMessage += " and workflow resumed";
+          this.pollWorkflowStatus();
+        }
       } catch (error) {
-        alert(
-          "ERROR: Failed to restart workflow."
-        );
-        console.log(error)
+        alert("ERROR: Failed to restart workflow.");
+        console.log(error);
       }
     },
-    disableUpstreamStages()  {
+    disableUpstreamStages() {
       // This function disables all the operators in stages except WebCaptions, Translate, and TransformText
       let data = {
-        "Name": "ContentLocalizationWorkflow",
-        "Configuration": this.workflow_config
-      }
+        Name: "ContentLocalizationWorkflow",
+        Configuration: this.workflow_config,
+      };
       data["Input"] = {
-        "AssetId": this.asset_id
+        AssetId: this.asset_id,
       };
 
-      let workflow = this.workflow_definition
-      let stage_name = workflow.StartAt
-      let stage = workflow["Stages"][stage_name]
-      let end = false
+      let workflow = this.workflow_definition;
+      let stage_name = workflow.StartAt;
+      let stage = workflow["Stages"][stage_name];
+      let end = false;
       while (end == false) {
-          console.log("Stage: "+ stage_name)
-          // If the current stage is End then end the loop.
-          if ("End" in stage && stage["End"] == true){
-              end = true
+        console.log("Stage: " + stage_name);
+        // If the current stage is End then end the loop.
+        if ("End" in stage && stage["End"] == true) {
+          end = true;
+        }
+        // Avoid disabling Translate or TransformText stages because
+        // their results need to be updated to reflect subtitle edits.
+        if (stage_name !== "Translate" && stage_name !== "TransformText") {
+          // Disable all the operators in this stage
+          for (const operator in data["Configuration"][stage_name]) {
+            data["Configuration"][stage_name][operator]["Enabled"] = false;
+            console.log(operator + " is disabled");
           }
-          // Avoid disabling Translate or TransformText stages because
-          // their results need to be updated to reflect subtitle edits.
-          if (stage_name !== "Translate" && stage_name !== "TransformText") {
-              // Disable all the operators in this stage
-              for (const operator in data["Configuration"][stage_name]){
-                data["Configuration"][stage_name][operator]["Enabled"] = false
-                console.log(operator + " is disabled")
-              }
-          }
-          // Now look at the next stage in the workflow
-          stage_name = stage["Next"]
-          stage = workflow["Stages"][stage_name]
+        }
+        // Now look at the next stage in the workflow
+        stage_name = stage["Next"];
+        stage = workflow["Stages"][stage_name];
       }
 
-      return data
-
+      return data;
     },
     rerunWorkflow: async function () {
       // This function reruns all the operators downstream from transcribe.
       let data = this.disableUpstreamStages();
-      data["Configuration"]["TransformText"]["WebToSRTCaptions"].SourceLanguageCode = this.sourceLanguageCode;
-      data["Configuration"]["TransformText"]["WebToVTTCaptions"].SourceLanguageCode = this.sourceLanguageCode;
-      data["Configuration"]["Translate"]["TranslateWebCaptions"].SourceLanguageCode = this.sourceLanguageCode;
-      data["Configuration"]["Translate"]["TranslateWebCaptions"].SourceLanguageCode = this.sourceLanguageCode;
+      data["Configuration"]["TransformText"][
+        "WebToSRTCaptions"
+      ].SourceLanguageCode = this.sourceLanguageCode;
+      data["Configuration"]["TransformText"][
+        "WebToVTTCaptions"
+      ].SourceLanguageCode = this.sourceLanguageCode;
+      data["Configuration"]["Translate"][
+        "TranslateWebCaptions"
+      ].SourceLanguageCode = this.sourceLanguageCode;
+      data["Configuration"]["Translate"][
+        "TranslateWebCaptions"
+      ].SourceLanguageCode = this.sourceLanguageCode;
       data["Configuration"]["PreprocessVideo"]["Thumbnail"].Enabled = true;
-      // The Transcribe operator sets the TranscribeSourceLanguage metadata in Globals, 
+      // The Transcribe operator sets the TranscribeSourceLanguage metadata in Globals,
       // which is used when loading subtitles from this component. However, when we resume
       // to populate subtitle changes to downstream operators (e.g. translate), then the
       // Globals will be erased. So, we'll initialize TranscribeSourceLanguage in Globals here:
-      data["Globals"] = {"MetaData": {"TranscribeSourceLanguage": this.sourceLanguageCode}};
-      console.log("Workflow config for rerun:")
+      data["Globals"] = {
+        MetaData: { TranscribeSourceLanguage: this.sourceLanguageCode },
+      };
+      console.log("Workflow config for rerun:");
       console.log(JSON.stringify(data));
 
-      let apiName = 'mieWorkflowApi'
-      let path = 'workflow/execution'
+      let apiName = "mieWorkflowApi";
+      let path = "workflow/execution";
       let requestOpts = {
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          response: true,
-          body: data,
-          queryStringParameters: {} // optional
+        headers: {
+          "Content-Type": "application/json",
+        },
+        response: true,
+        body: data,
+        queryStringParameters: {}, // optional
       };
 
       try {
@@ -1036,247 +1391,266 @@ export default {
           console.log("ERROR: Failed to start workflow.");
           console.log(response.data.Code);
           console.log(response.data.Message);
-          console.log("URL: " + this.WORKFLOW_API_ENDPOINT + 'workflow/execution');
+          console.log(
+            "URL: " + this.WORKFLOW_API_ENDPOINT + "workflow/execution"
+          );
           console.log("Data:");
           console.log(JSON.stringify(data));
-          console.log((data));
+          console.log(data);
           console.log("Response: " + response.status);
         } else {
-          this.saveNotificationMessage += " and workflow resumed"
+          this.saveNotificationMessage += " and workflow resumed";
           console.log("workflow executing");
           console.log(response);
         }
       } catch (error) {
-        alert(
-          "ERROR: Failed to start workflow. Check Workflow API logs."
-        );
-        console.log(error)
+        alert("ERROR: Failed to start workflow. Check Workflow API logs.");
+        console.log(error);
       }
     },
     listVocabulariesRequest: async function () {
-      let apiName = 'mieWorkflowApi'
-      let path = 'service/transcribe/list_vocabularies'
+      let apiName = "mieWorkflowApi";
+      let path = "service/transcribe/list_vocabularies";
       let requestOpts = {
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          response: true
+        headers: {
+          "Content-Type": "application/json",
+        },
+        response: true,
       };
       try {
         let response = await this.$Amplify.API.get(apiName, path, requestOpts);
-        this.customVocabularyList = response.data["Vocabularies"].map(({VocabularyName, VocabularyState, LanguageCode}) => ({
+        this.customVocabularyList = response.data["Vocabularies"].map(
+          ({ VocabularyName, VocabularyState, LanguageCode }) => ({
             name: VocabularyName,
             status: VocabularyState,
             language_code: LanguageCode,
-            name_and_status: VocabularyState === "READY" ? VocabularyName : VocabularyName + " [" + VocabularyState + "]",
-            notEnabled: VocabularyState === "PENDING"
-          }))
-          // if any vocab is PENDING, then poll status until it is not PENDING. This is necessary so custom vocabs become selectable in the GUI as soon as they become ready.
-          if (this.customVocabularyList.filter(item => item.status === "PENDING").length > 0) {
-            if (this.vocab_status_polling == null) {
-              this.pollVocabularyStatus();
-            }
-          } else {
-            if (this.vocab_status_polling != null) {
-              clearInterval(this.vocab_status_polling)
-              this.vocab_status_polling = null
-            }
-          }
-      } catch (error) {
-        alert(
-          "ERROR: Failed to list vocabularies."
+            name_and_status:
+              VocabularyState === "READY"
+                ? VocabularyName
+                : VocabularyName + " [" + VocabularyState + "]",
+            notEnabled: VocabularyState === "PENDING",
+          })
         );
-        console.log(error)
+        // if any vocab is PENDING, then poll status until it is not PENDING. This is necessary so custom vocabs become selectable in the GUI as soon as they become ready.
+        if (
+          this.customVocabularyList.filter((item) => item.status === "PENDING")
+            .length > 0
+        ) {
+          if (this.vocab_status_polling == null) {
+            this.pollVocabularyStatus();
+          }
+        } else {
+          if (this.vocab_status_polling != null) {
+            clearInterval(this.vocab_status_polling);
+            this.vocab_status_polling = null;
+          }
+        }
+      } catch (error) {
+        alert("ERROR: Failed to list vocabularies.");
+        console.log(error);
       }
     },
     deleteVocabulary: async function () {
-      this.$refs['delete-vocab-modal'].show()
+      this.$refs["delete-vocab-modal"].show();
     },
     deleteVocabularyRequest: async function (customVocabularyName) {
-      let apiName = 'mieWorkflowApi'
-      let path = 'service/transcribe/delete_vocabulary'
+      let apiName = "mieWorkflowApi";
+      let path = "service/transcribe/delete_vocabulary";
       let requestOpts = {
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: {
-            "vocabulary_name":customVocabularyName
-            },
-          response: true
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: {
+          vocabulary_name: customVocabularyName,
+        },
+        response: true,
       };
       try {
         let response = await this.$Amplify.API.post(apiName, path, requestOpts);
         if (response.status === 200) {
-          console.log("Success! Vocabulary deleted.")
-          this.vocabularyNotificationMessage = "Deleted vocabulary: " + customVocabularyName
-          this.vocabularyNotificationStatus = "success"
-          this.showVocabularyNotification = 5
+          console.log("Success! Vocabulary deleted.");
+          this.vocabularyNotificationMessage =
+            "Deleted vocabulary: " + customVocabularyName;
+          this.vocabularyNotificationStatus = "success";
+          this.showVocabularyNotification = 5;
           // reset the radio button selection
-          this.customVocabularySelected = ""
-          this.customVocabularySaved = []
-          this.listVocabulariesRequest()
+          this.customVocabularySelected = "";
+          this.customVocabularySaved = [];
+          this.listVocabulariesRequest();
         } else {
-          console.log("Failed to delete vocabulary")
-          this.vocabularyNotificationMessage = "Failed to delete vocabulary: " + customVocabularyName
-          this.vocabularyNotificationStatus = "danger"
-          this.showVocabularyNotification = 5
+          console.log("Failed to delete vocabulary");
+          this.vocabularyNotificationMessage =
+            "Failed to delete vocabulary: " + customVocabularyName;
+          this.vocabularyNotificationStatus = "danger";
+          this.showVocabularyNotification = 5;
         }
       } catch (error) {
-        alert(
-          "ERROR: Failed to delete vocabularies."
-        );
-        console.log(error)
+        alert("ERROR: Failed to delete vocabularies.");
+        console.log(error);
       }
     },
     overwriteVocabularyRequest: async function (customVocabularyName) {
       await this.deleteVocabularyRequest(customVocabularyName).then(() => {
-        this.saveVocabularyRequest(customVocabularyName)
-      })
+        this.saveVocabularyRequest(customVocabularyName);
+      });
     },
     saveVocabularyRequest: async function (customVocabularyName) {
-      let apiName = 'mieWorkflowApi'
-      let path = 'service/transcribe/create_vocabulary'
-      const s3uri = "s3://"+this.DATAPLANE_BUCKET+"/"+customVocabularyName
+      let apiName = "mieWorkflowApi";
+      let path = "service/transcribe/create_vocabulary";
+      const s3uri =
+        "s3://" + this.DATAPLANE_BUCKET + "/" + customVocabularyName;
       let requestOpts = {
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: {
-            "vocabulary_name":customVocabularyName,
-            "s3uri": s3uri,
-            "language_code": this.vocabulary_language_code
-          },
-          response: true
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: {
+          vocabulary_name: customVocabularyName,
+          s3uri: s3uri,
+          language_code: this.vocabulary_language_code,
+        },
+        response: true,
       };
 
       try {
         let response = await this.$Amplify.API.post(apiName, path, requestOpts);
         if (response.status === 200) {
-          console.log("Saving custom vocabulary...")
-            this.vocabularyNotificationMessage = "Saving custom vocabulary " + customVocabularyName + "..."
-            this.vocabularyNotificationStatus = "success"
-            this.showVocabularyNotification = 5
-            this.customVocabularyUnsaved = []
+          console.log("Saving custom vocabulary...");
+          this.vocabularyNotificationMessage =
+            "Saving custom vocabulary " + customVocabularyName + "...";
+          this.vocabularyNotificationStatus = "success";
+          this.showVocabularyNotification = 5;
+          this.customVocabularyUnsaved = [];
         } else {
-          console.log("Failed to save vocabulary")
-            this.vocabularyNotificationMessage = "Failed to save vocabulary: " + customVocabularyName
-            this.vocabularyNotificationStatus = "danger"
-            this.showVocabularyNotification = 5
+          console.log("Failed to save vocabulary");
+          this.vocabularyNotificationMessage =
+            "Failed to save vocabulary: " + customVocabularyName;
+          this.vocabularyNotificationStatus = "danger";
+          this.showVocabularyNotification = 5;
         }
         // clear the custom vocabulary name used in the save vocab modal form
-          this.customVocabularyCreateNew = ''
+        this.customVocabularyCreateNew = "";
       } catch (error) {
-        alert(
-          "ERROR: Failed to save vocabularies."
-        );
-        console.log(error)
+        alert("ERROR: Failed to save vocabularies.");
+        console.log(error);
       }
     },
     saveVocabulary: async function () {
-
-      let apiName = 'mieDataplaneApi'
-      let path = 'upload'
+      let apiName = "mieDataplaneApi";
+      let path = "upload";
       let requestOpts = {
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: {
-            "S3Bucket": this.DATAPLANE_BUCKET,
-            "S3Key":this.customVocabularyName
-            },
-          response: true
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: {
+          S3Bucket: this.DATAPLANE_BUCKET,
+          S3Key: this.customVocabularyName,
+        },
+        response: true,
       };
 
       try {
         let response = await this.$Amplify.API.post(apiName, path, requestOpts);
         // Now that we have the presigned url, upload the custom vocab file.
-          response.data.fields["file"] = this.customVocabularyFile
-          console.log("Upload request:")
-          let curl_command = "curl --request POST"
-          for (let key in response.data.fields) {
-            curl_command += " -F " + key + "=\""+response.data.fields[key]+"\""
+        response.data.fields["file"] = this.customVocabularyFile;
+        console.log("Upload request:");
+        let curl_command = "curl --request POST";
+        for (let key in response.data.fields) {
+          curl_command += " -F " + key + '="' + response.data.fields[key] + '"';
+        }
+        curl_command += " " + response.data.url;
+        console.log(curl_command);
+        let formData = new FormData();
+        for (const name in response.data.fields) {
+          formData.append(name, response.data.fields[name]);
+        }
+        fetch(response.data.url, {
+          method: "POST",
+          body: formData,
+        }).then(() => {
+          // Now that the custom vocab file is in s3, create the custom vocab in AWS Transcribe.
+          // If the custom vocab already exists then overwrite it.
+          const customVocabularyName = this.customVocabularyName;
+          if (
+            this.customVocabularyList.some(
+              (item) => item.name === this.customVocabularyName
+            )
+          ) {
+            console.log(
+              "Overwriting custom vocabulary: " + customVocabularyName
+            );
+            this.overwriteVocabularyRequest(customVocabularyName);
+          } else {
+            this.saveVocabularyRequest(customVocabularyName);
           }
-          curl_command += " " + response.data.url
-          console.log(curl_command)
-          let formData  = new FormData();
-          for(const name in response.data.fields) {
-            formData.append(name, response.data.fields[name]);
-          }
-          fetch(response.data.url, {
-            method: 'POST',
-            body: formData
-          }).then(() => {
-            // Now that the custom vocab file is in s3, create the custom vocab in AWS Transcribe.
-            // If the custom vocab already exists then overwrite it.
-            const customVocabularyName = this.customVocabularyName
-            if (this.customVocabularyList.some(item => item.name === this.customVocabularyName)) {
-              console.log("Overwriting custom vocabulary: " + customVocabularyName)
-              this.overwriteVocabularyRequest(customVocabularyName)
-            } else {
-              this.saveVocabularyRequest(customVocabularyName)
-            }
-            // Save custom vocabulary to vuex state so we can reload it
-            // if Transcribe failed to save it.
-            let unsavedCustomVocabularies = this.unsaved_custom_vocabularies
-            // Delete any vocabs in vuex state with the same name
-            // as the current one being saved.
-            unsavedCustomVocabularies = this.unsaved_custom_vocabularies.filter(item => (item.Name !== customVocabularyName))
-            // Save the unsaved vocab in vuex state.
-            unsavedCustomVocabularies = unsavedCustomVocabularies.concat({"Name":customVocabularyName, "vocabulary":this.customVocabularyUnion})
-            this.$store.commit('updateUnsavedCustomVocabularies', unsavedCustomVocabularies);
-          })
+          // Save custom vocabulary to vuex state so we can reload it
+          // if Transcribe failed to save it.
+          let unsavedCustomVocabularies = this.unsaved_custom_vocabularies;
+          // Delete any vocabs in vuex state with the same name
+          // as the current one being saved.
+          unsavedCustomVocabularies = this.unsaved_custom_vocabularies.filter(
+            (item) => item.Name !== customVocabularyName
+          );
+          // Save the unsaved vocab in vuex state.
+          unsavedCustomVocabularies = unsavedCustomVocabularies.concat({
+            Name: customVocabularyName,
+            vocabulary: this.customVocabularyUnion,
+          });
+          this.$store.commit(
+            "updateUnsavedCustomVocabularies",
+            unsavedCustomVocabularies
+          );
+        });
       } catch (error) {
-        alert(
-          "ERROR: Failed to save vocabularies."
-        );
-        console.log(error)
+        alert("ERROR: Failed to save vocabularies.");
+        console.log(error);
       }
     },
     saveCaptions: async function () {
       // This function saves captions to the dataplane
       // and reruns or resumes the workflow.
-      this.isSaving=true;
-      const operator_name = "WebCaptions_"+this.sourceLanguageCode
-      const webCaptions = {"WebCaptions": this.webCaptions}
-      console.log("this.webCaptions")
-      console.log(JSON.stringify(this.webCaptions))
-      let data={
-        "OperatorName": operator_name,
-        "Results": webCaptions,
-        "WorkflowId": this.workflow_id
-      }
+      this.isSaving = true;
+      const operator_name = "WebCaptions_" + this.sourceLanguageCode;
+      const webCaptions = { WebCaptions: this.webCaptions };
+      console.log("this.webCaptions");
+      console.log(JSON.stringify(this.webCaptions));
+      let data = {
+        OperatorName: operator_name,
+        Results: webCaptions,
+        WorkflowId: this.workflow_id,
+      };
 
-      let apiName = 'mieDataplaneApi'
-      let path = 'metadata/' + this.asset_id
+      let apiName = "mieDataplaneApi";
+      let path = "metadata/" + this.asset_id;
       let requestOpts = {
         response: true,
-        headers: {'Content-Type': 'application/json'},
-        body: data
+        headers: { "Content-Type": "application/json" },
+        body: data,
       };
       try {
         let response = await this.$Amplify.API.post(apiName, path, requestOpts);
         if (response.status === 200) {
-          this.isSaving=true;
-          console.log("Captions saved")
-          clearInterval(this.workflow_status_polling)
-          this.saveNotificationMessage = "Captions saved"
+          this.isSaving = true;
+          console.log("Captions saved");
+          clearInterval(this.workflow_status_polling);
+          this.saveNotificationMessage = "Captions saved";
           if (this.workflow_status === "Waiting") {
             this.resumeWorkflow();
             this.workflow_status = "Started";
-          } else if (this.workflow_status === "Complete" ||
-            this.workflow_status === "Error") {
+          } else if (
+            this.workflow_status === "Complete" ||
+            this.workflow_status === "Error"
+          ) {
             this.rerunWorkflow();
           }
           this.showSaveNotification = 5;
-        }
-        else {
+        } else {
           console.log("ERROR: Failed to upload captions.");
           console.log(response.data.Code);
           console.log(response.data.Message);
           console.log("Response: " + response.status);
         }
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
     },
     // Uncomment to enable Upload button
@@ -1284,115 +1658,132 @@ export default {
     //   this.$refs['my-modal'].show()
     // },
     showSaveConfirmation() {
-      this.$refs['save-modal'].show()
+      this.$refs["save-modal"].show();
     },
-    showVocabConfirmation: async function() {
-      await this.listVocabulariesRequest()
-      this.$refs['save-modal'].hide()
-      this.$refs['vocab-modal'].show()
+    showVocabConfirmation: async function () {
+      await this.listVocabulariesRequest();
+      this.$refs["save-modal"].hide();
+      this.$refs["vocab-modal"].show();
     },
     uploadCaptionsFile(event) {
       // Uncomment to enable Upload button
       // this.$refs['my-modal'].hide()
       const file = event.target.files[0];
       const reader = new FileReader();
-      reader.onload = e => this.webCaptions = JSON.parse(e.target.result);
+      reader.onload = (e) => (this.webCaptions = JSON.parse(e.target.result));
       reader.readAsText(file);
       this.sortWebCaptions();
     },
     getWebCaptions: async function () {
-
       // Get paginated web captions
-      const operator_name = "WebCaptions_"+this.sourceLanguageCode
-      let cursor=''
-      this.webCaptions = []
-      this.getWebCaptionPages(this.asset_id, operator_name, cursor)
+      const operator_name = "WebCaptions_" + this.sourceLanguageCode;
+      let cursor = "";
+      this.webCaptions = [];
+      this.getWebCaptionPages(this.asset_id, operator_name, cursor);
     },
     getWebCaptionPages: async function (asset_id, operator_name, cursor) {
-
-      let apiName = 'mieDataplaneApi'
-      let path = 'metadata/' + this.asset_id + '/' + operator_name
+      let apiName = "mieDataplaneApi";
+      let path = "metadata/" + this.asset_id + "/" + operator_name;
       let requestOpts = {
         response: true,
-        headers: {'Content-Type': 'application/json'}
+        headers: { "Content-Type": "application/json" },
       };
 
       if (cursor.length != 0) {
-        path = path + '?cursor=' + cursor
+        path = path + "?cursor=" + cursor;
       }
 
       try {
         let response = await this.$Amplify.API.get(apiName, path, requestOpts);
+        console.log("response", response);
+
         if (response.status !== 200) {
-            console.log("ERROR: Failed to download captions.");
-            console.log(response.data.Code);
-            console.log(response.data.Message);
-            console.log("Response: " + response.status);
-            this.isBusy = false
-            this.noSubtitles = true
-          }
-          if (response.data.results) {
-            cursor = response.data.cursor;
-            this.webCaptions = response.data.results["WebCaptions"]
-            console.log("low confidence words:")
-            // TODO: highlight low confidence words in GUI
-            // const low_confidence_words = []
-            // const confidence_threshold = 0.90
-            // console.log("confidence threshold: " + confidence_threshold)
-            // this.webCaptions.forEach(item => {
-            //   item.wordConfidence.filter(word => word.c < "0.99")
-            //     .forEach(word => {
-            //       // add low confidence word to array if it hasn't already been added
-            //       if (low_confidence_words.includes(word.w) === false) {
-            //         low_confidence_words.push(word.w)
-            //       }
-            //     })
-            // })
-            // console.log(low_confidence_words)
-            // FIXME - why do we need to sort as we read this?  Isn't it already sorted?
-            // this.sortWebCaptions()
-            this.isBusy = false
-            if (cursor)
-              this.getWebCaptionPages(url,cursor)
-          } else {
-            this.videoOptions.captions = []
-          }
+          console.log("ERROR: Failed to download captions.");
+          console.log(response.data.Code);
+          console.log(response.data.Message);
+          console.log("Response: " + response.status);
+          this.isBusy = false;
+          this.noSubtitles = true;
+        }
+        if (response.data.results) {
+          cursor = response.data.cursor;
+          this.webCaptions = response.data.results["WebCaptions"];
+          console.log("low confidence words:");
+          // TODO: highlight low confidence words in GUI
+          // const low_confidence_words = []
+          // const confidence_threshold = 0.90
+          // console.log("confidence threshold: " + confidence_threshold)
+          // this.webCaptions.forEach(item => {
+          //   item.wordConfidence.filter(word => word.c < "0.99")
+          //     .forEach(word => {
+          //       // add low confidence word to array if it hasn't already been added
+          //       if (low_confidence_words.includes(word.w) === false) {
+          //         low_confidence_words.push(word.w)
+          //       }
+          //     })
+          // })
+          // console.log(low_confidence_words)
+          // FIXME - why do we need to sort as we read this?  Isn't it already sorted?
+          // this.sortWebCaptions()
+          this.isBusy = false;
+          if (cursor) this.getWebCaptionPages(url, cursor);
+        } else {
+          this.videoOptions.captions = [];
+        }
       } catch (error) {
-        this.noSubtitles = true
-        this.isBusy = false
-        console.log(error)
+        this.noSubtitles = true;
+        this.isBusy = false;
+        console.log(error);
       }
     },
     add_row(index) {
-      this.webCaptions.splice(index+1, 0, {"start":this.webCaptions[index].end,"caption":"","end":this.webCaptions[index+1].start})
-      this.$refs["caption"+(index+1)].focus();
-      this.player.currentTime(this.webCaptions[index+1].start)
-      this.player.pause()
+      this.webCaptions.splice(index + 1, 0, {
+        start: this.webCaptions[index].end,
+        caption: "",
+        end: this.webCaptions[index + 1].start,
+      });
+      this.$refs["caption" + (index + 1)].focus();
+      this.player.currentTime(this.webCaptions[index + 1].start);
+      this.player.pause();
     },
     delete_row(index) {
-      this.webCaptions.splice(index, 1)
+      this.webCaptions.splice(index, 1);
     },
     add_vocab_row(index) {
       // The index provided is the index into the concatenated unsaved and saved vocabularies
       // Unsaved vocab will always be listed first, so we convert the index as follows so that
       // we can splice appropriately in the unsaved or saved vocabulary.
       if (index < this.customVocabularyUnsaved.length) {
-        this.customVocabularyUnsaved.splice(index+1, 0, {})
+        this.customVocabularyUnsaved.splice(index + 1, 0, {});
       } else {
-        this.customVocabularyUnsaved.splice(index-this.customVocabularyUnsaved.length, 0, {})      }
+        this.customVocabularyUnsaved.splice(
+          index - this.customVocabularyUnsaved.length,
+          0,
+          {}
+        );
+      }
     },
     delete_vocab_row(index) {
       // The index provided is the index into the concatenated unsaved and saved vocabularies
       // Unsaved vocab will always be listed first, so we convert the index as follows so that
       // we can splice appropriately in the unsaved or saved vocabulary.
       if (index < this.customVocabularyUnsaved.length) {
-        this.customVocabularyUnsaved.splice(index, 1)
+        this.customVocabularyUnsaved.splice(index, 1);
       } else {
-        const index_into_saved_vocab = index - this.customVocabularyUnsaved.length
-        this.customVocabularySaved.splice(index_into_saved_vocab, 1)
+        const index_into_saved_vocab =
+          index - this.customVocabularyUnsaved.length;
+        this.customVocabularySaved.splice(index_into_saved_vocab, 1);
       }
-      if (this.customVocabularyUnion.length === 0){
-        this.customVocabularyUnsaved = [{"original_phrase":"","new_phrase":"","sounds_like":"","IPA":"","display_as":""}]
+      if (this.customVocabularyUnion.length === 0) {
+        this.customVocabularyUnsaved = [
+          {
+            original_phrase: "",
+            new_phrase: "",
+            sounds_like: "",
+            IPA: "",
+            display_as: "",
+          },
+        ];
       }
     },
     pollWorkflowStatus() {
@@ -1400,80 +1791,90 @@ export default {
       const poll_frequency = 5000;
       this.workflow_status_polling = setInterval(() => {
         this.getAssetWorkflowStatus();
-      }, poll_frequency)
+      }, poll_frequency);
     },
     pollVocabularyStatus() {
       // Poll frequency in milliseconds
       const poll_frequency = 10000;
       this.vocab_status_polling = setInterval(() => {
         this.listVocabulariesRequest();
-      }, poll_frequency)
+      }, poll_frequency);
     },
     phrase_formatter(phrase) {
       // Transcribe requires numbers to be spelled out in the phrase field.
       // Transcribe also requires spaces to be dashes in the phrase field.
       // This function will automatically make those changes for user input to the phrase field.
-      let phrase_with_numbers_as_words = phrase
-      if (phrase.match(/\d+/g) != null)
-      {
+      let phrase_with_numbers_as_words = phrase;
+      if (phrase.match(/\d+/g) != null) {
         phrase_with_numbers_as_words = phrase
-          .replace(phrase.match(/\d+/g)[0], converter.toWords(phrase.match(/\d+/g)[0]))
-          .replace(/,/g, '')
+          .replace(
+            phrase.match(/\d+/g)[0],
+            converter.toWords(phrase.match(/\d+/g)[0])
+          )
+          .replace(/,/g, "");
       }
-      return phrase_with_numbers_as_words.replace(/\s+/g, '-')
+      return phrase_with_numbers_as_words.replace(/\s+/g, "-");
     },
   },
-}
+};
 </script>
 
 <style>
-  .start-time-field {
-    padding: 0 !important;
-    margin: 0 !important;
-    margin-bottom: 4px !important;
-    border: 0 !important;
-    height: auto;
-    background-color: white !important;
-  }
-  .stop-time-field {
-    padding: 0 !important;
-    margin: 0 !important;
-    border: 0 !important;
-    height: auto;
-    background-color: white !important;
-  }
-  .hidden_header {
-    display: none;
-  }
-  .event-line-editor {
-    overflow: scroll;
-    height: 500px;
-    border-top: 1px solid #e2e2e2;
-    border-bottom: 1px solid #e2e2e2;
-  }
-  /* these options needed for MacOS to make scrollbar visible when not in use */
-  .event-line-editor::-webkit-scrollbar {
-    -webkit-appearance: none;
-    width: 7px;
-  }
-  /* these options needed for MacOS to make scrollbar visible when not in use */
-  .event-line-editor::-webkit-scrollbar-thumb {
-    border-radius: 4px;
-    background-color: rgba(0, 0, 0, .5);
-    -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
-  }
-  .custom-text-field {
-    background-color: white !important;
-    border: 0;
-    padding-left: 0px !important;
-    padding-right: 0px !important;
-    margin-top: 0px !important;
-    margin-bottom: 0px !important;
-  }
-  tr.b-table-row-selected {
-    border-left: 1px solid #cc181e !important;
-  }
-  table.b-table-selectable > tbody > tr.b-table-row-selected > td {
-    background-color: white !important;
-  }
+.start-time-field {
+  padding: 0 !important;
+  margin: 0 !important;
+  margin-bottom: 4px !important;
+  border: 0 !important;
+  height: auto;
+  background-color: white !important;
+}
+
+.stop-time-field {
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  height: auto;
+  background-color: white !important;
+}
+
+.hidden_header {
+  display: none;
+}
+
+.event-line-editor {
+  overflow: scroll;
+  height: 500px;
+  border-top: 1px solid #e2e2e2;
+  border-bottom: 1px solid #e2e2e2;
+}
+
+/* these options needed for MacOS to make scrollbar visible when not in use */
+.event-line-editor::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 7px;
+}
+
+/* these options needed for MacOS to make scrollbar visible when not in use */
+.event-line-editor::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
+}
+
+.custom-text-field {
+  background-color: white !important;
+  border: 0;
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  margin-top: 0px !important;
+  margin-bottom: 0px !important;
+}
+
+tr.b-table-row-selected {
+  border-left: 1px solid #cc181e !important;
+}
+
+table.b-table-selectable > tbody > tr.b-table-row-selected > td {
+  background-color: white !important;
+}
 </style>
