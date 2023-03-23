@@ -151,8 +151,11 @@ def copy_source(event, context):
                             'Bucket': source_bucket,
                             'Key': key
                         }
-                        destination_key = key.split('Website/', 1)[1]
-
+                        try:
+                            destination_key = key.split('Website/', 1)[1]
+                        except:
+                            destination_key = key.split('website/', 1)[1]
+                            
                         # if replace_env_variables is True and destination_key == "runtimeConfig.json":
                         if "runtimeConfig.json" in destination_key:
                             LOGGER.info("updating runtimeConfig.json")
