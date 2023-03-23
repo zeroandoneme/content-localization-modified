@@ -23,18 +23,21 @@
         <b-col>
           <div>
             <b-row align-h="center">
-              <b-tabs content-class="mt-3" fill>
-                <!-- <b-tab
+              <b-tabs
+                v-if="showVideo === 'show-video'"
+                content-class="mt-3"
+                fill
+              >
+                <b-tab
                   v-if="mediaType !== 'image'"
                   title="Speech Recognition"
                   active
-                  @click="currentView = 'Transcript'; speechTabs = 0"
+                  @click="
+                    currentView = 'Transcript';
+                    speechTabs = 0;
+                  "
                 >
-                  <b-tabs
-                    v-model="speechTabs"
-                    content-class="mt-3"
-                    fill
-                  >
+                  <b-tabs v-model="speechTabs" content-class="mt-3" fill>
                     <b-tab
                       title="Transcript"
                       @click="currentView = 'Transcript'"
@@ -43,45 +46,28 @@
                       title="Subtitles"
                       @click="currentView = 'Subtitles'"
                     />
-                                              <b-tab
-                                                title="Translation"
-                                                @click="currentView = 'Translation'"
-                                              />
-                                              <b-tab
-                          title="KeyPhrases"
-                                                @click="currentView = 'KeyPhrases'"
-                                              />
-                          <b-tab
-                            title="Entities"
-                            @click="currentView = 'Entities'"
-                          />
-                        </b-tabs>
-                      </b-tab> -->
-                <b-tab v-model="speechTabs" content-class="mt-3" fill>
-                  <b-tab
-                    title="Transcript"
-                    @click="currentView = 'Transcript'"
-                  />
-                  <b-tab title="Subtitles" @click="currentView = 'Subtitles'" />
-                  <b-tab
-                    title="Translation"
-                    @click="currentView = 'Translation'"
-                  />
-                  <!-- <b-tab title="KeyPhrases" @click="currentView = 'KeyPhrases'" />
-                <b-tab title="Entities" @click="currentView = 'Entities'" /> -->
+                    <b-tab
+                      title="Translation"
+                      @click="currentView = 'Translation'"
+                    />
+                    <b-tab
+                      title="KeyPhrases"
+                      @click="currentView = 'KeyPhrases'"
+                    />
+                    <b-tab title="Entities" @click="currentView = 'Entities'" />
+                  </b-tabs>
                 </b-tab>
-                <!-- <b-tab
+                <b-tab
                   title="ML Vision"
-                  @click="currentView = 'LabelObjects'; mlTabs = 0"
+                  @click="
+                    currentView = 'LabelObjects';
+                    mlTabs = 0;
+                  "
                 >
                   <b-container fluid>
                     <b-row>
                       <div>
-                        <b-tabs
-                          v-model="mlTabs"
-                          content-class="mt-3"
-                          fill
-                        >
+                        <b-tabs v-model="mlTabs" content-class="mt-3" fill>
                           <b-tab
                             title="Objects"
                             @click="currentView = 'LabelObjects'"
@@ -101,35 +87,44 @@
                           <b-tab
                             title="Words"
                             @click="currentView = 'TextDetection'"
-                                                    />
-                                                    <b-tab
-                                                      title="Cues"
-                                                      @click="currentView = 'TechnicalCues'"
-                                                    />
-                                                    <b-tab
-                                                      title="Shots"
-                                                      @click="currentView = 'ShotDetection'"
-                                                    />
-                                                  </b-tabs>
-                                                </div>
-                                              </b-row>
-                                            </b-container>
-                                          </b-tab> -->
+                          />
+                          <b-tab
+                            title="Cues"
+                            @click="currentView = 'TechnicalCues'"
+                          />
+                          <b-tab
+                            title="Shots"
+                            @click="currentView = 'ShotDetection'"
+                          />
+                        </b-tabs>
+                      </div>
+                    </b-row>
+                  </b-container>
+                </b-tab>
               </b-tabs>
-              <b-form-checkbox
-                id="show-video"
-                v-model="showVideo"
-                name="show-video"
-                value="show-video"
-                unchecked-value="dont-show-video"
+              <b-tabs
+                v-if="showVideo === 'dont-show-video'"
+                content-class="mt-3"
+                fill
               >
-                Show Video
-              </b-form-checkbox>
+                <b-tab title="Transcript" @click="currentView = 'Transcript'" />
+                <b-tab title="Subtitles" @click="currentView = 'Subtitles'" />
+                <b-tab
+                  title="Translation"
+                  @click="currentView = 'Translation'"
+                />
+                <b-tab title="KeyPhrases" @click="currentView = 'KeyPhrases'" />
+                <b-tab title="Entities" @click="currentView = 'Entities'" />
+              </b-tabs>
             </b-row>
           </div>
           <div>
             <keep-alive>
-              <component :is="currentView" :mediaType="mediaType">
+              <component
+                :is="currentView"
+                :mediaType="mediaType"
+                :showVideo="showVideo"
+              >
                 <!-- inactive components will be cached! -->
               </component>
             </keep-alive>
@@ -220,55 +215,55 @@ export default {
     VideoPlayer,
     ImageFeature,
     LineChart,
-    // LabelObjects: () => ({
-    //   component: new Promise(function (resolve) {
-    //     setTimeout(function () {
-    //       resolve(import('@/components/LabelObjects.vue'));
-    //     }, 1000);
-    //   }),
-    //   loading: Loading
-    // }),
+    LabelObjects: () => ({
+      component: new Promise(function (resolve) {
+        setTimeout(function () {
+          resolve(import("@/components/LabelObjects.vue"));
+        }, 1000);
+      }),
+      loading: Loading,
+    }),
 
-    // Celebrities: () => ({
-    //   component: new Promise(function (resolve) {
-    //     setTimeout(function () {
-    //       resolve(import('@/components/Celebrities.vue'));
-    //     }, 1000);
-    //   }),
-    //   loading: Loading,
-    // }),
-    // TextDetection: () => ({
-    //   component: new Promise(function (resolve) {
-    //     setTimeout(function () {
-    //       resolve(import('@/components/TextDetection.vue'));
-    //     }, 1000);
-    //   }),
-    //   loading: Loading,
-    // }),
-    // TechnicalCues: () => ({
-    //   component: new Promise(function (resolve) {
-    //     setTimeout(function () {
-    //       resolve(import('@/components/TechnicalCues.vue'));
-    //     }, 1000);
-    //   }),
-    //   loading: Loading,
-    // }),
-    // ShotDetection: () => ({
-    //   component: new Promise(function (resolve) {
-    //     setTimeout(function () {
-    //       resolve(import('@/components/ShotDetection.vue'));
-    //     }, 1000);
-    //   }),
-    //   loading: Loading,
-    // }),
-    // ContentModeration: () => ({
-    //   component: new Promise(function (resolve) {
-    //     setTimeout(function () {
-    //       resolve(import('@/components/ContentModeration.vue'));
-    //     }, 1000);
-    //   }),
-    //   loading: Loading,
-    // }),
+    Celebrities: () => ({
+      component: new Promise(function (resolve) {
+        setTimeout(function () {
+          resolve(import("@/components/Celebrities.vue"));
+        }, 1000);
+      }),
+      loading: Loading,
+    }),
+    TextDetection: () => ({
+      component: new Promise(function (resolve) {
+        setTimeout(function () {
+          resolve(import("@/components/TextDetection.vue"));
+        }, 1000);
+      }),
+      loading: Loading,
+    }),
+    TechnicalCues: () => ({
+      component: new Promise(function (resolve) {
+        setTimeout(function () {
+          resolve(import("@/components/TechnicalCues.vue"));
+        }, 1000);
+      }),
+      loading: Loading,
+    }),
+    ShotDetection: () => ({
+      component: new Promise(function (resolve) {
+        setTimeout(function () {
+          resolve(import("@/components/ShotDetection.vue"));
+        }, 1000);
+      }),
+      loading: Loading,
+    }),
+    ContentModeration: () => ({
+      component: new Promise(function (resolve) {
+        setTimeout(function () {
+          resolve(import("@/components/ContentModeration.vue"));
+        }, 1000);
+      }),
+      loading: Loading,
+    }),
     Transcript: () => ({
       component: new Promise(function (resolve) {
         setTimeout(function () {
@@ -293,31 +288,31 @@ export default {
       }),
       loading: Loading,
     }),
-    // FaceDetection: () => ({
-    //   component: new Promise(function (resolve) {
-    //     setTimeout(function () {
-    //       resolve(import('@/components/FaceDetection.vue'));
-    //     }, 1000);
-    //   }),
-    //   loading: Loading,
-    // }),
-    // Entities: () => ({
-    //   component: new Promise(function (resolve) {
-    //     setTimeout(function () {
-    //       resolve(import('@/components/ComprehendEntities.vue'));
-    //     }, 1000);
-    //   }),
-    //   loading: Loading,
-    // }),
-    // KeyPhrases: () => ({
-    //   component: new Promise(function (resolve) {
-    //     setTimeout(function () {
-    //       resolve(import('@/components/ComprehendKeyPhrases.vue'));
-    //     }, 1000);
-    //   }),
-    //   loading: Loading,
-    //   error: ComponentLoadingError
-    // })
+    FaceDetection: () => ({
+      component: new Promise(function (resolve) {
+        setTimeout(function () {
+          resolve(import("@/components/FaceDetection.vue"));
+        }, 1000);
+      }),
+      loading: Loading,
+    }),
+    Entities: () => ({
+      component: new Promise(function (resolve) {
+        setTimeout(function () {
+          resolve(import("@/components/ComprehendEntities.vue"));
+        }, 1000);
+      }),
+      loading: Loading,
+    }),
+    KeyPhrases: () => ({
+      component: new Promise(function (resolve) {
+        setTimeout(function () {
+          resolve(import("@/components/ComprehendKeyPhrases.vue"));
+        }, 1000);
+      }),
+      loading: Loading,
+      error: ComponentLoadingError,
+    }),
   },
   data: function () {
     return {
@@ -445,17 +440,23 @@ export default {
           this.mediaType = "video";
         }
         this.filename = filename;
-        this.getVideoUrl();
+
+        console.log(response);
+
+        if (response.data.results.S3Key.endsWith("(no-video)")) {
+          this.showVideo = "dont-show-video";
+        } else {
+          this.getVideoUrl();
+        }
         this.getVttCaptions();
       } catch (error) {
         alert(error);
-        console.log(error);
       }
       this.updateAssetId();
     },
     async getVideoUrl() {
       // This function gets the video URL then initializes the video player
-      const bucket = this.s3_uri.split("/")[2];
+      // const bucket = this.s3_uri.split("/")[2];
       let s3uri = this.s3_uri;
       let asset_id = this.$route.params.asset_id;
       // TODO: Get the path to the proxy mp4 from the mediaconvert operator - clarifying this comment, this should just be a from the dataplane results of the mediaconvert operator
@@ -481,6 +482,7 @@ export default {
         queryStringParameters: {}, // optional,
         responseType: "text",
       };
+
       try {
         let response = await this.$Amplify.API.post(apiName, path, requestOpts);
         this.videoOptions.sources[0].src = response.data;

@@ -39,6 +39,12 @@
 <script>
 export default {
   name: "Transcript",
+  props: {
+    showVideo: {
+      type: String,
+      required: true,
+    },
+  },
   data() {
     return {
       transcript: "",

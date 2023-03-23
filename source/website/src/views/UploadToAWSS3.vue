@@ -1,17 +1,17 @@
 <!-- 
-######################################################################################################################
-#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                #
-#                                                                                                                    #
-#  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    #
-#  with the License. A copy of the License is located at                                                             #
-#                                                                                                                    #
-#      http://www.apache.org/licenses/LICENSE-2.0                                                                    #
-#                                                                                                                    #
-#  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES #
-#  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    #
-#  and limitations under the License.                                                                                #
-######################################################################################################################
--->
+    ######################################################################################################################
+    #  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                #
+    #                                                                                                                    #
+    #  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    #
+    #  with the License. A copy of the License is located at                                                             #
+    #                                                                                                                    #
+    #      http://www.apache.org/licenses/LICENSE-2.0                                                                    #
+    #                                                                                                                    #
+    #  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES #
+    #  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    #
+    #  and limitations under the License.                                                                                #
+    ######################################################################################################################
+    -->
 <template>
   <div>
     <Header :is-upload-active="true" />
@@ -101,22 +101,34 @@
       <b-collapse id="collapse-2">
         <b-container class="text-left">
           <b-card-group deck>
-            <!-- <b-card header="Video Operators">
+            <b-card header="Video Operators">
               <b-form-group>
-                  <b-form-checkbox-group
-                    id="checkbox-group-1"
-                    v-model="enabledOperators"
-                    :options="videoOperators"
-                    name="flavour-1"
-                  ></b-form-checkbox-group>
-                  <label>Thumbnail position: </label>
-                  <b-form-input v-model="thumbnail_position" type="range" min="1" max="20" step="1"></b-form-input> {{ thumbnail_position }} sec
-                  <b-form-input v-if="enabledOperators.includes('faceSearch')" id="face_collection_id" v-model="faceCollectionId" placeholder="Enter face collection id"></b-form-input>
-                </b-form-group>
-                <div v-if="videoFormError" style="color:red">
-                                            {{ videoFormError }}
-                                        </div>
-                                                                      </b-card> -->
+                <b-form-checkbox-group
+                  id="checkbox-group-1"
+                  v-model="enabledOperators"
+                  :options="videoOperators"
+                  name="flavour-1"
+                ></b-form-checkbox-group>
+                <label>Thumbnail position: </label>
+                <b-form-input
+                  v-model="thumbnail_position"
+                  type="range"
+                  min="1"
+                  max="20"
+                  step="1"
+                ></b-form-input>
+                {{ thumbnail_position }} sec
+                <b-form-input
+                  v-if="enabledOperators.includes('faceSearch')"
+                  id="face_collection_id"
+                  v-model="faceCollectionId"
+                  placeholder="Enter face collection id"
+                ></b-form-input>
+              </b-form-group>
+              <div v-if="videoFormError" style="color: red">
+                {{ videoFormError }}
+              </div>
+            </b-card>
             <b-card header="Audio Operators">
               <div>
                 <label>Source Language</label>
@@ -138,11 +150,11 @@
                   >
                     Transcribe
                   </b-form-checkbox>
-                  <!-- <div v-if="enabledOperators.includes('Transcribe')"> -->
-                  <!-- Custom vocab and CLM options are disabled when source language 
-                                                                                                          autodetect is enabled in order to prevent users from selecting 
-                                                                                                          incompatible customizations. -->
-                  <!-- <div v-if="transcribeLanguage !== 'auto'">
+                  <div v-if="enabledOperators.includes('Transcribe')">
+                    <!-- Custom vocab and CLM options are disabled when source language 
+                                                                                                              autodetect is enabled in order to prevent users from selecting 
+                                                                                                              incompatible customizations. -->
+                    <!-- <div v-if="transcribeLanguage !== 'auto'">
                       Custom Vocabulary
                       <b-form-select
                         v-model="customVocabulary"
@@ -174,7 +186,7 @@
                       </b-form-select>
                       <br />
                     </div> -->
-                  <!-- </div> -->
+                  </div>
 
                   <b-form-checkbox
                     value="Subtitles"
@@ -201,94 +213,196 @@
                   v-model="enabledOperators"
                   name="textOperators"
                 >
-                  <!-- <b-form-checkbox value="ComprehendEntities">
+                  <b-form-checkbox value="ComprehendEntities">
                     Comprehend Entities
-                              </b-form-checkbox>
+                  </b-form-checkbox>
                   <b-form-checkbox value="ComprehendKeyPhrases">
                     Comprehend Key Phrases
-                  </b-form-checkbox> -->
+                  </b-form-checkbox>
                   <b-form-checkbox value="Translate">
                     Translate
                   </b-form-checkbox>
-                  <!-- <b-form-checkbox value="Polly">
-                                Generate audio translations with Amazon Polly
-                              </b-form-checkbox> -->
+                  <b-form-checkbox value="Polly">
+                    Generate audio translations with Amazon Polly
+                  </b-form-checkbox>
                 </b-form-checkbox-group>
-                <!-- <div v-if="pollyFormError" style="color:red">
+                <div v-if="pollyFormError" style="color: red">
                   {{ pollyFormError }}
-                </div> -->
-                <!-- <b-form-checkbox
-                  v-if="enabledOperators.includes('ComprehendEntities') || enabledOperators.includes('ComprehendKeyPhrases')"
-                  v-model="ComprehendEncryption">
+                </div>
+                <b-form-checkbox
+                  v-if="
+                    enabledOperators.includes('ComprehendEntities') ||
+                    enabledOperators.includes('ComprehendKeyPhrases')
+                  "
+                  v-model="ComprehendEncryption"
+                >
                   Encrypt Comprehend Job
-                            </b-form-checkbox> -->
-                <!-- <b-form-input
-                              v-if="ComprehendEncryption && (enabledOperators.includes('ComprehendEntities') || enabledOperators.includes('ComprehendKeyPhrases'))"
-                  v-model="kmsKeyId" placeholder="Enter KMS key ID"></b-form-input> -->
-                <!-- <div v-if="enabledOperators.includes('Translate')"> -->
-                <!-- Show only those custom terminologies whose source language match
-                       the source language that the user specified for Transcribe. -->
-                <!-- <div v-if="customTerminologyList.filter(x => x.SourceLanguageCode === sourceLanguageCode).length > 0">
-                    <b>Custom Terminologies:</b> ({{ customTerminology.length }} selected)
-                    <b-form-select v-model="customTerminology"
-                      :options="customTerminologyList.filter(x => x.SourceLanguageCode === sourceLanguageCode).map(x => { return { 'text': x.Name + ' (' + x.TargetLanguageCodes + ')', 'value': { 'Name': x.Name, 'TargetLanguageCodes': x.TargetLanguageCodes } } })"
-                      multiple>
+                </b-form-checkbox>
+                <b-form-input
+                  v-if="
+                    ComprehendEncryption &&
+                    (enabledOperators.includes('ComprehendEntities') ||
+                      enabledOperators.includes('ComprehendKeyPhrases'))
+                  "
+                  v-model="kmsKeyId"
+                  placeholder="Enter KMS key ID"
+                ></b-form-input>
+                <!-- <div v-if="enabledOperators.includes('Translate')">
+                  Show only those custom terminologies whose source language match
+                   the source language that the user specified for Transcribe.
+                  <div
+                    v-if="
+                      customTerminologyList.filter(
+                        (x) => x.SourceLanguageCode === sourceLanguageCode
+                      ).length > 0
+                    "
+                  >
+                    <b>Custom Terminologies:</b> ({{ customTerminology.length }}
+                    selected)
+                    <b-form-select
+                      v-model="customTerminology"
+                      :options="
+                        customTerminologyList
+                          .filter(
+                            (x) => x.SourceLanguageCode === sourceLanguageCode
+                          )
+                          .map((x) => {
+                            return {
+                              text: x.Name + ' (' + x.TargetLanguageCodes + ')',
+                              value: {
+                                Name: x.Name,
+                                TargetLanguageCodes: x.TargetLanguageCodes,
+                              },
+                            };
+                          })
+                      "
+                      multiple
+                    >
                     </b-form-select>
-                  </div> -->
-                <!-- If the user specified auto-detect for the Transcribe source
-                       language then show all custom terminologies. -->
-                <!-- <div v-else-if="sourceLanguageCode === 'auto' && customTerminologyList.length > 0">
-                    <b>Custom Terminologies:</b> ({{ customTerminology.length }} selected)
-                    <b-form-select v-model="customTerminology"
-                      :options="customTerminologyList.map(x => { return { 'text': x.Name + ' (' + x.TargetLanguageCodes + ')', 'value': { 'Name': x.Name, 'TargetLanguageCodes': x.TargetLanguageCodes } } })"
-                      multiple>
+                  </div>
+                  If the user specified auto-detect for the Transcribe source
+                           language then show all custom terminologies.
+                  <div
+                    v-else-if="
+                      sourceLanguageCode === 'auto' &&
+                      customTerminologyList.length > 0
+                    "
+                  >
+                    <b>Custom Terminologies:</b> ({{ customTerminology.length }}
+                    selected)
+                    <b-form-select
+                      v-model="customTerminology"
+                      :options="
+                        customTerminologyList.map((x) => {
+                          return {
+                            text: x.Name + ' (' + x.TargetLanguageCodes + ')',
+                            value: {
+                              Name: x.Name,
+                              TargetLanguageCodes: x.TargetLanguageCodes,
+                            },
+                          };
+                        })
+                      "
+                      multiple
+                    >
                     </b-form-select>
-                              </div>
-                <div v-else>
-                                <b>Custom Terminologies:</b>
+                  </div>
+                  <div v-else>
+                    <b>Custom Terminologies:</b>
                     (none available)
                   </div>
-                  <div v-if="overlappingTerminologies.length > 0" style="color:red">
-                    You must not select terminologies that define translations for the same language. The following
-                    terminologies overlap:
+                  <div
+                    v-if="overlappingTerminologies.length > 0"
+                    style="color: red"
+                  >
+                    You must not select terminologies that define translations
+                    for the same language. The following terminologies overlap:
                     <ul id="overlapping_terminologies">
-                                  <li v-for="terminology in overlappingTerminologies" :key="terminology">
-                      {{ terminology }}
-                                  </li>
+                      <li
+                        v-for="terminology in overlappingTerminologies"
+                        :key="terminology"
+                      >
+                        {{ terminology }}
+                      </li>
                     </ul>
-                  </div> -->
-                <!-- Show only those parallel data sets whose source language match
-                       the source language that the user specified for Transcribe. -->
-                <!-- <div v-if="parallelDataList.filter(x => x.SourceLanguageCode === sourceLanguageCode).length > 0">
+                  </div>
+                  Show only those parallel data sets whose source language match
+                           the source language that the user specified for Transcribe.
+                  <div
+                    v-if="
+                      parallelDataList.filter(
+                        (x) => x.SourceLanguageCode === sourceLanguageCode
+                      ).length > 0
+                    "
+                  >
                     <b>Parallel Data:</b> ({{ parallelData.length }} selected)
-                                <b-form-select v-model="parallelData"
-                      :options="parallelDataList.filter(x => x.SourceLanguageCode === sourceLanguageCode).map(x => { return { 'text': x.Name + ' (' + x.TargetLanguageCodes + ')', 'value': { 'Name': x.Name, 'TargetLanguageCodes': x.TargetLanguageCodes } } })"
-                      multiple>
+                    <b-form-select
+                      v-model="parallelData"
+                      :options="
+                        parallelDataList
+                          .filter(
+                            (x) => x.SourceLanguageCode === sourceLanguageCode
+                          )
+                          .map((x) => {
+                            return {
+                              text: x.Name + ' (' + x.TargetLanguageCodes + ')',
+                              value: {
+                                Name: x.Name,
+                                TargetLanguageCodes: x.TargetLanguageCodes,
+                              },
+                            };
+                          })
+                      "
+                      multiple
+                    >
                     </b-form-select>
-                              </div> -->
-                <!-- If the user specified auto-detect for the Transcribe source
-                       language then show all parallel data sets. -->
-                <!-- <div v-else-if="sourceLanguageCode === 'auto' && parallelDataList.length > 0">
+                  </div>
+                   If the user specified auto-detect for the Transcribe source
+                           language then show all parallel data sets. 
+                  <div
+                    v-else-if="
+                      sourceLanguageCode === 'auto' &&
+                      parallelDataList.length > 0
+                    "
+                  >
                     <b>Parallel Data:</b> ({{ parallelData.length }} selected)
-                    <b-form-select v-model="parallelData"
-                      :options="parallelDataList.map(x => { return { 'text': x.Name + ' (' + x.TargetLanguageCodes + ')', 'value': { 'Name': x.Name, 'TargetLanguageCodes': x.TargetLanguageCodes } } })"
-                      multiple>
+                    <b-form-select
+                      v-model="parallelData"
+                      :options="
+                        parallelDataList.map((x) => {
+                          return {
+                            text: x.Name + ' (' + x.TargetLanguageCodes + ')',
+                            value: {
+                              Name: x.Name,
+                              TargetLanguageCodes: x.TargetLanguageCodes,
+                            },
+                          };
+                        })
+                      "
+                      multiple
+                    >
                     </b-form-select>
-                              </div> -->
-                <!-- <div v-else>
-                                <b>Parallel Data:</b>
-                                (none available)
-                              </div> -->
-                <!-- <div v-if="overlappingParallelData.length > 0" style="color:red">
-                                You must not select Parallel Data that define translations for the same language. The following
-                                Parallel Data overlap:
-                                <ul id="overlapping_parallel_data">
-                                  <li v-for="parallel_data in overlappingParallelData" :key="parallel_data">
-                                    {{ parallel_data }}
-                                  </li>
-                                </ul>
-                              </div> -->
-                <!-- </div> -->
+                  </div>
+                  <div v-else>
+                    <b>Parallel Data:</b>
+                    (none available)
+                  </div>
+                  <div
+                    v-if="overlappingParallelData.length > 0"
+                    style="color: red"
+                  >
+                    You must not select Parallel Data that define translations
+                    for the same language. The following Parallel Data overlap:
+                    <ul id="overlapping_parallel_data">
+                      <li
+                        v-for="parallel_data in overlappingParallelData"
+                        :key="parallel_data"
+                      >
+                        {{ parallel_data }}
+                      </li>
+                    </ul>
+                  </div>
+                </div> -->
                 <div v-if="enabledOperators.includes('Translate')">
                   <b-form-group>
                     <b>Target Languages:</b>
@@ -426,7 +540,7 @@ export default {
       thumbnail_position: 10,
       invalid_file_types: 0,
       upload_in_progress: false,
-      enabledOperators: ["Transcribe", "Translate"],
+      enabledOperators: ["thumbnail", "Transcribe", "Translate"],
       enable_caption_editing: false,
       videoOperators: [
         { text: "Object Detection", value: "labelDetection" },
@@ -442,8 +556,8 @@ export default {
         { text: "Subtitles", value: "Subtitles" },
       ],
       textOperators: [
-        // { text: "Comprehend Key Phrases", value: "ComprehendKeyPhrases" },
-        // { text: "Comprehend Entities", value: "ComprehendEntities" },
+        { text: "Comprehend Key Phrases", value: "ComprehendKeyPhrases" },
+        { text: "Comprehend Entities", value: "ComprehendEntities" },
         { text: "Translate", value: "Translate" },
       ],
       faceCollectionId: "",
@@ -767,37 +881,37 @@ export default {
         },
       };
       const AnalyzeVideo = {
-        // faceDetection: {
-        //   Enabled: this.enabledOperators.includes("faceDetection"),
-        // },
-        // technicalCueDetection: {
-        //   Enabled: this.enabledOperators.includes("technicalCueDetection"),
-        // },
-        // shotDetection: {
-        //   Enabled: this.enabledOperators.includes("shotDetection"),
-        // },
-        // celebrityRecognition: {
-        //   MediaType: "Video",
-        //   Enabled: this.enabledOperators.includes("celebrityRecognition"),
-        // },
-        // labelDetection: {
-        //   MediaType: "Video",
-        //   Enabled: this.enabledOperators.includes("labelDetection"),
-        // },
-        // personTracking: {
-        //   MediaType: "Video",
-        //   Enabled: false,
-        // },
-        // faceSearch: {
-        //   MediaType: "Video",
-        //   Enabled: this.enabledOperators.includes("faceSearch"),
-        //   CollectionId:
-        //     this.faceCollectionId === "" ? "undefined" : this.faceCollectionId,
-        // },
-        // textDetection: {
-        //   MediaType: "Video",
-        //   Enabled: this.enabledOperators.includes("textDetection"),
-        // },
+        faceDetection: {
+          Enabled: this.enabledOperators.includes("faceDetection"),
+        },
+        technicalCueDetection: {
+          Enabled: this.enabledOperators.includes("technicalCueDetection"),
+        },
+        shotDetection: {
+          Enabled: this.enabledOperators.includes("shotDetection"),
+        },
+        celebrityRecognition: {
+          MediaType: "Video",
+          Enabled: this.enabledOperators.includes("celebrityRecognition"),
+        },
+        labelDetection: {
+          MediaType: "Video",
+          Enabled: this.enabledOperators.includes("labelDetection"),
+        },
+        personTracking: {
+          MediaType: "Video",
+          Enabled: false,
+        },
+        faceSearch: {
+          MediaType: "Video",
+          Enabled: this.enabledOperators.includes("faceSearch"),
+          CollectionId:
+            this.faceCollectionId === "" ? "undefined" : this.faceCollectionId,
+        },
+        textDetection: {
+          MediaType: "Video",
+          Enabled: this.enabledOperators.includes("textDetection"),
+        },
         Mediaconvert: {
           MediaType: "Video",
           Enabled: false,
@@ -808,20 +922,20 @@ export default {
           MediaType: "Audio",
         },
       };
-      // const AnalyzeText = {
-      //   ComprehendEntities: {
-      //     MediaType: "Text",
-      //     Enabled: this.enabledOperators.includes("ComprehendEntities"),
-      //   },
-      //   ComprehendKeyPhrases: {
-      //     MediaType: "Text",
-      //     Enabled: this.enabledOperators.includes("ComprehendKeyPhrases"),
-      //   },
-      // };
-      // if (this.ComprehendEncryption === true && this.kmsKeyId.length > 0) {
-      //   AnalyzeText["ComprehendEntities"]["KmsKeyId"] = this.kmsKeyId;
-      //   AnalyzeText["ComprehendKeyPhrases"]["KmsKeyId"] = this.kmsKeyId;
-      // }
+      const AnalyzeText = {
+        ComprehendEntities: {
+          MediaType: "Text",
+          Enabled: this.enabledOperators.includes("ComprehendEntities"),
+        },
+        ComprehendKeyPhrases: {
+          MediaType: "Text",
+          Enabled: this.enabledOperators.includes("ComprehendKeyPhrases"),
+        },
+      };
+      if (this.ComprehendEncryption === true && this.kmsKeyId.length > 0) {
+        AnalyzeText["ComprehendEntities"]["KmsKeyId"] = this.kmsKeyId;
+        AnalyzeText["ComprehendKeyPhrases"]["KmsKeyId"] = this.kmsKeyId;
+      }
       const TransformText = {
         WebToSRTCaptions: {
           MediaType: "MetadataOnly",
@@ -851,11 +965,11 @@ export default {
             this.enabledOperators.includes("Translate") ||
             this.enabledOperators.includes("Subtitles"),
         },
-        // PollyWebCaptions: {
-        //   MediaType: "MetadataOnly",
-        //   Enabled: this.enabledOperators.includes("Polly"),
-        //   SourceLanguageCode: this.sourceLanguageCode,
-        // },
+        PollyWebCaptions: {
+          MediaType: "MetadataOnly",
+          Enabled: this.enabledOperators.includes("Polly"),
+          SourceLanguageCode: this.sourceLanguageCode,
+        },
       };
       const WebCaptions = {
         WebCaptions: {
@@ -903,10 +1017,41 @@ export default {
           Enabled: false,
         },
         Mediainfo: {
-          Enabled: true,
+          Enabled: false,
         },
       };
+
       const AnalyzeVideo = {
+        faceDetection: {
+          Enabled: false,
+        },
+        technicalCueDetection: {
+          Enabled: false,
+        },
+        shotDetection: {
+          Enabled: false,
+        },
+        celebrityRecognition: {
+          MediaType: "Video",
+          Enabled: false,
+        },
+        labelDetection: {
+          MediaType: "Video",
+          Enabled: false,
+        },
+        personTracking: {
+          MediaType: "Video",
+          Enabled: false,
+        },
+        faceSearch: {
+          MediaType: "Video",
+          Enabled: false,
+          CollectionId: "undefined",
+        },
+        textDetection: {
+          MediaType: "Video",
+          Enabled: false,
+        },
         Mediaconvert: {
           MediaType: "Video",
           Enabled: false,
@@ -918,6 +1063,16 @@ export default {
         },
       };
 
+      const AnalyzeText = {
+        ComprehendEntities: {
+          MediaType: "Text",
+          Enabled: false,
+        },
+        ComprehendKeyPhrases: {
+          MediaType: "Text",
+          Enabled: false,
+        },
+      };
       const TransformText = {
         WebToSRTCaptions: {
           MediaType: "MetadataOnly",
@@ -944,6 +1099,11 @@ export default {
           Enabled:
             this.enabledOperators.includes("Translate") ||
             this.enabledOperators.includes("Subtitles"),
+        },
+        PollyWebCaptions: {
+          MediaType: "MetadataOnly",
+          Enabled: this.enabledOperators.includes("Polly"),
+          SourceLanguageCode: this.sourceLanguageCode,
         },
       };
       const WebCaptions = {
@@ -977,6 +1137,8 @@ export default {
       workflow_config["Configuration"]["TransformText"] = TransformText;
       workflow_config["Configuration"]["WebCaptions"] = WebCaptions;
       workflow_config["Configuration"]["Translate"] = Translate;
+      workflow_config["Configuration"]["AnalyzeText"] = AnalyzeText;
+
       return workflow_config;
     },
     workflowConfigWithInput() {
@@ -1028,10 +1190,10 @@ export default {
     this.getCurlCommand();
     this.executed_assets = this.execution_history;
     this.pollWorkflowStatus();
-    this.listVocabulariesRequest();
-    this.listTerminologiesRequest();
-    this.listParallelDataRequest();
-    this.listLanguageModelsRequest();
+    // this.listVocabulariesRequest();
+    // this.listTerminologiesRequest();
+    // this.listParallelDataRequest();
+    // this.listLanguageModelsRequest();
   },
   beforeDestroy() {
     clearInterval(this.workflow_status_polling);
@@ -1057,19 +1219,19 @@ export default {
     },
     selectAll: function () {
       this.enabledOperators = [
-        // "labelDetection",
-        // "textDetection",
-        // "celebrityRecognition",
-        // "faceDetection",
+        "labelDetection",
+        "textDetection",
+        "celebrityRecognition",
+        "faceDetection",
         "thumbnail",
         "Transcribe",
         "Translate",
         "Subtitles",
-        // "Polly",
-        // "ComprehendKeyPhrases",
-        // "ComprehendEntities",
-        // "technicalCueDetection",
-        // "shotDetection",
+        "Polly",
+        "ComprehendKeyPhrases",
+        "ComprehendEntities",
+        "technicalCueDetection",
+        "shotDetection",
       ];
     },
     clearAll: function () {
@@ -1242,9 +1404,11 @@ export default {
           } else {
             this.workflow_config = vm.vTTOrSRTWorkflowConfig;
             this.workflow_config["Input"] = {
-              WebCaptions: {
-                S3Bucket: this.DATAPLANE_BUCKET,
-                S3Key: s3Key,
+              Media: {
+                Video: {
+                  S3Bucket: this.DATAPLANE_BUCKET,
+                  S3Key: s3Key + "(no-video)",
+                },
               },
             };
             if (this.existingSubtitlesFilename === "") {

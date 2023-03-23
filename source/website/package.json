@@ -6,7 +6,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint --no-fix",
-    "deploy": "aws s3 sync --acl public-read --profile content --delete dist/ s3://content-localization-on-aws-modified/content-localization/v0.0/Website/"
+    "deploy": "aws s3 sync --acl public-read --profile content --delete dist/ s3://zeroandone-solutions/content-localization-on-aws-modified/content-localization/v0.0/Website/"
   },
   "dependencies": {
     "aws-amplify": "4.3.2",

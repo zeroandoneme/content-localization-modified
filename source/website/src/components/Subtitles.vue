@@ -540,6 +540,12 @@ const converter = require("number-to-words");
 
 export default {
   name: "Subtitles",
+  props: {
+    showVideo: {
+      type: String,
+      required: true,
+    },
+  },
   data() {
     return {
       asset_id: this.$route.params.asset_id,
@@ -731,9 +737,13 @@ export default {
   },
   activated: function () {
     console.log("activated component:", this.operator);
+    console.log("showVideo", this.showVideo);
+
     this.isBusy = true;
-    this.handleVideoPlay();
-    this.handleVideoSeek();
+    if (this.showVideo === "show-video") {
+      this.handleVideoPlay();
+      this.handleVideoSeek();
+    }
     this.getWorkflowId();
     this.getAssetWorkflowStatus();
   },
@@ -744,6 +754,8 @@ export default {
   },
   methods: {
     getVttCaptions: async function () {
+      console.log("getVttCaptions");
+
       const asset_id = this.$route.params.asset_id;
       let apiName = "mieDataplaneApi";
       let path = "metadata/" + asset_id + "/WebToVTTCaptions";
@@ -756,6 +768,11 @@ export default {
       try {
         let transcribed_language = this.transcribe_language_code.split("-")[0];
         let response = await this.$Amplify.API.get(apiName, path, requestOpts);
+
+        console.log("response", response);
+
+        console.log("transcribed_language", transcribed_language);
+
         let source_language_caption =
           response.data.results.CaptionsCollection.filter((item) => {
             return item.LanguageCode === transcribed_language;
@@ -776,9 +793,13 @@ export default {
           responseType: "text",
         };
 
+        console.log("requestOpts", requestOpts);
+
         try {
           let res = await this.$Amplify.API.post(apiName, path, requestOpts);
           // record the signed urls in an array
+
+          console.log("res data vtt", res.data);
           this.vtt_url = res.data;
         } catch (error) {
           console.error(error);
@@ -788,6 +809,7 @@ export default {
       }
     },
     getSrtCaptions: async function () {
+      console.log("getSrtCaptions");
       const asset_id = this.$route.params.asset_id;
       let apiName = "mieDataplaneApi";
       let path = "metadata/" + asset_id + "/WebToSRTCaptions";
@@ -804,6 +826,7 @@ export default {
           response.data.results.CaptionsCollection.filter((item) => {
             return item.LanguageCode === transcribed_language;
           })[0];
+
         const bucket = source_language_caption.Results.S3Bucket;
         const key = source_language_caption.Results.S3Key;
         // get URL to captions file in S3
@@ -1184,13 +1207,9 @@ export default {
       };
       try {
         let response = await this.$Amplify.API.get(apiName, path, requestOpts);
+        console.log("getTranscribeLanguage", response);
         const operator_info = [];
-        console.log("1188", response.data);
-        console.log(
-          "response.data.Configuration.Translate.TranslateWebCaptions.SourceLanguageCode",
-          response.data.Configuration.Translate.TranslateWebCaptions
-            .SourceLanguageCode
-        );
+
         this.sourceLanguageCode =
           response.data.Configuration.Translate.TranslateWebCaptions.SourceLanguageCode;
 
@@ -1676,6 +1695,8 @@ export default {
     },
     getWebCaptions: async function () {
       // Get paginated web captions
+
+      console.log("getWebCaptions");
       const operator_name = "WebCaptions_" + this.sourceLanguageCode;
       let cursor = "";
       this.webCaptions = [];
