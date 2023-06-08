@@ -18,55 +18,27 @@
     <b-alert v-model="showSaveNotification" variant="success" dismissible fade>
       {{ saveNotificationMessage }}
     </b-alert>
-    <b-alert
-      v-model="showVocabularyNotification"
-      :variant="vocabularyNotificationStatus"
-      dismissible
-      fade
-    >
+    <b-alert v-model="showVocabularyNotification" :variant="vocabularyNotificationStatus" dismissible fade>
       {{ vocabularyNotificationMessage }}
     </b-alert>
-    <b-modal
-      ref="vocab-modal"
-      size="lg"
-      title="Save Vocabulary?"
-      :ok-disabled="
-        validVocabularyName === false ||
-        (customVocabularySelected === '' && customVocabularyCreateNew === '') ||
-        customVocabularyUnion.length === 0
-      "
-      ok-title="Save"
-      @ok="saveVocabulary()"
-    >
+    <b-modal ref="vocab-modal" size="lg" title="Save Vocabulary?" :ok-disabled="validVocabularyName === false ||
+      (customVocabularySelected === '' && customVocabularyCreateNew === '') ||
+      customVocabularyUnion.length === 0
+      " ok-title="Save" @ok="saveVocabulary()">
       <b-row>
         <b-col>
           <b>Select a vocabulary to overwrite:</b>
           <b-form-group v-if="customVocabularyList.length > 0">
-            <b-form-radio-group
-              id="custom-vocab-selection"
-              v-model="customVocabularySelected"
-              name="custom-vocab-list"
-              :options="customVocabularyList"
-              text-field="name_and_status"
-              value-field="name"
-              disabled-field="notEnabled"
-              stacked
-            >
+            <b-form-radio-group id="custom-vocab-selection" v-model="customVocabularySelected" name="custom-vocab-list"
+              :options="customVocabularyList" text-field="name_and_status" value-field="name" disabled-field="notEnabled"
+              stacked>
             </b-form-radio-group>
           </b-form-group>
-          <div
-            v-if="
-              customVocabularyList.length > 0 && customVocabularySelected !== ''
-            "
-          >
+          <div v-if="customVocabularyList.length > 0 && customVocabularySelected !== ''
+            ">
             Delete the selected vocabulary (optional):
-            <b-button
-              v-b-tooltip.hover.right
-              size="sm"
-              title="Delete selected vocabulary"
-              variant="danger"
-              @click="deleteVocabulary"
-            >
+            <b-button v-b-tooltip.hover.right size="sm" title="Delete selected vocabulary" variant="danger"
+              @click="deleteVocabulary">
               Delete
             </b-button>
           </div>
@@ -77,36 +49,18 @@
               the user enters an invalid custom vocabulary name. Otherwise we
               set the state to null so no validity indicator is shown. -->
           Vocabulary Name:
-          <b-form-input
-            v-if="customVocabularyList.length > 0"
-            v-model="customVocabularyCreateNew"
-            size="sm"
-            placeholder="Enter vocabulary name (optional)"
-            :state="validVocabularyName ? null : false"
-            @focus="customVocabularySelected = ''"
-          ></b-form-input>
-          <b-form-input
-            v-else
-            v-model="customVocabularyCreateNew"
-            size="sm"
-            placeholder="Enter vocabulary name"
-            :state="validVocabularyName ? null : false"
-          ></b-form-input>
+          <b-form-input v-if="customVocabularyList.length > 0" v-model="customVocabularyCreateNew" size="sm"
+            placeholder="Enter vocabulary name (optional)" :state="validVocabularyName ? null : false"
+            @focus="customVocabularySelected = ''"></b-form-input>
+          <b-form-input v-else v-model="customVocabularyCreateNew" size="sm" placeholder="Enter vocabulary name"
+            :state="validVocabularyName ? null : false"></b-form-input>
           Vocabulary Language:
-          <b-form-select
-            v-model="vocabulary_language_code"
-            :options="transcribeLanguages"
-            size="sm"
-          />
+          <b-form-select v-model="vocabulary_language_code" :options="transcribeLanguages" size="sm" />
           <hr />
           <label>Draft vocabulary name: </label> {{ customVocabularyName }}
-          <div
-            v-if="
-              customVocabularySelected === '' &&
-              customVocabularyCreateNew === ''
-            "
-            style="color: red"
-          >
+          <div v-if="customVocabularySelected === '' &&
+            customVocabularyCreateNew === ''
+            " style="color: red">
             Select a vocabulary name or specify a new vocabulary name.
           </div>
           <br />
@@ -117,25 +71,13 @@
       <hr />
       <div v-if="customVocabularyUnsaved.length !== 0">
         Draft vocabulary (click to edit):
-        <div
-          v-if="customVocabularySelected != ''"
-          class="text-info"
-          style="font-size: 80%"
-        >
+        <div v-if="customVocabularySelected != ''" class="text-info" style="font-size: 80%">
           Rows shown in blue are from vocabulary,
           <b>{{ customVocabularySelected }}.</b>
         </div>
       </div>
-      <b-table
-        :items="customVocabularyUnion"
-        :fields="customVocabularyFields"
-        selectable
-        select-mode="single"
-        fixed
-        responsive="sm"
-        bordered
-        small
-      >
+      <b-table :items="customVocabularyUnion" :fields="customVocabularyFields" selectable select-mode="single" fixed
+        responsive="sm" bordered small>
         <!-- This template adds an additional row in the header
           to highlight the fields in the custom vocab schema. -->
         <template #default>
@@ -150,20 +92,12 @@
           <b-row no-gutters>
             <b-col cols="10">
               <div v-if="row.index < customVocabularyUnsaved.length">
-                <b-form-input
-                  v-model="row.item.original_phrase"
-                  class="custom-text-field"
-                  :formatter="phrase_formatter"
-                  lazy-formatter
-                />
+                <b-form-input v-model="row.item.original_phrase" class="custom-text-field" :formatter="phrase_formatter"
+                  lazy-formatter />
               </div>
               <div v-else>
-                <b-form-input
-                  v-model="row.item.original_phrase"
-                  class="custom-text-field text-info"
-                  :formatter="phrase_formatter"
-                  lazy-formatter
-                />
+                <b-form-input v-model="row.item.original_phrase" class="custom-text-field text-info"
+                  :formatter="phrase_formatter" lazy-formatter />
               </div>
             </b-col>
           </b-row>
@@ -172,20 +106,12 @@
           <b-row no-gutters>
             <b-col cols="10">
               <div v-if="row.index < customVocabularyUnsaved.length">
-                <b-form-input
-                  v-model="row.item.new_phrase"
-                  class="custom-text-field"
-                  :formatter="phrase_formatter"
-                  lazy-formatter
-                />
+                <b-form-input v-model="row.item.new_phrase" class="custom-text-field" :formatter="phrase_formatter"
+                  lazy-formatter />
               </div>
               <div v-else>
-                <b-form-input
-                  v-model="row.item.new_phrase"
-                  class="custom-text-field text-info"
-                  :formatter="phrase_formatter"
-                  lazy-formatter
-                />
+                <b-form-input v-model="row.item.new_phrase" class="custom-text-field text-info"
+                  :formatter="phrase_formatter" lazy-formatter />
               </div>
             </b-col>
           </b-row>
@@ -194,16 +120,10 @@
           <b-row no-gutters>
             <b-col cols="10">
               <div v-if="row.index < customVocabularyUnsaved.length">
-                <b-form-input
-                  v-model="row.item.sounds_like"
-                  class="custom-text-field"
-                />
+                <b-form-input v-model="row.item.sounds_like" class="custom-text-field" />
               </div>
               <div v-else>
-                <b-form-input
-                  v-model="row.item.sounds_like"
-                  class="custom-text-field text-info"
-                />
+                <b-form-input v-model="row.item.sounds_like" class="custom-text-field text-info" />
               </div>
             </b-col>
           </b-row>
@@ -212,16 +132,10 @@
           <b-row no-gutters>
             <b-col cols="10">
               <div v-if="row.index < customVocabularyUnsaved.length">
-                <b-form-input
-                  v-model="row.item.IPA"
-                  class="custom-text-field"
-                />
+                <b-form-input v-model="row.item.IPA" class="custom-text-field" />
               </div>
               <div v-else>
-                <b-form-input
-                  v-model="row.item.IPA"
-                  class="custom-text-field text-info"
-                />
+                <b-form-input v-model="row.item.IPA" class="custom-text-field text-info" />
               </div>
             </b-col>
           </b-row>
@@ -230,81 +144,43 @@
           <b-row no-gutters>
             <b-col cols="9">
               <div v-if="row.index < customVocabularyUnsaved.length">
-                <b-form-input
-                  v-model="row.item.display_as"
-                  class="custom-text-field"
-                />
+                <b-form-input v-model="row.item.display_as" class="custom-text-field" />
               </div>
               <div v-else>
-                <b-form-input
-                  v-model="row.item.display_as"
-                  class="custom-text-field text-info"
-                />
+                <b-form-input v-model="row.item.display_as" class="custom-text-field text-info" />
               </div>
             </b-col>
             <b-col nopadding cols="1">
               <span style="position: absolute; top: 0px">
-                <b-button
-                  v-b-tooltip.hover.right
-                  size="sm"
-                  style="display: flex"
-                  variant="link"
-                  title="Remove row"
-                  @click="delete_vocab_row(row.index)"
-                >
-                  <b-icon
-                    font-scale=".9"
-                    icon="x-circle"
-                    color="lightgrey"
-                  ></b-icon>
+                <b-button v-b-tooltip.hover.right size="sm" style="display: flex" variant="link" title="Remove row"
+                  @click="delete_vocab_row(row.index)">
+                  <b-icon font-scale=".9" icon="x-circle" color="lightgrey"></b-icon>
                 </b-button>
               </span>
               <span style="position: absolute; bottom: 0px">
-                <b-button
-                  v-b-tooltip.hover.right
-                  size="sm"
-                  style="display: flex"
-                  variant="link"
-                  title="Add row"
-                  @click="add_vocab_row(row.index)"
-                >
-                  <b-icon
-                    font-scale=".9"
-                    icon="plus-square"
-                    color="lightgrey"
-                  ></b-icon>
+                <b-button v-b-tooltip.hover.right size="sm" style="display: flex" variant="link" title="Add row"
+                  @click="add_vocab_row(row.index)">
+                  <b-icon font-scale=".9" icon="plus-square" color="lightgrey"></b-icon>
                 </b-button>
               </span>
             </b-col>
           </b-row>
         </template>
       </b-table>
-      <div
-        v-if="
-          customVocabularyUnion.length === 0 &&
-          customVocabularyList.length !== 0 &&
-          customVocabularySelected === ''
-        "
-        style="color: red"
-      >
+      <div v-if="customVocabularyUnion.length === 0 &&
+        customVocabularyList.length !== 0 &&
+        customVocabularySelected === ''
+        " style="color: red">
         Select an existing vocabulary.<br />
       </div>
-      <div
-        v-if="
-          customVocabularySelected !== '' && customVocabularyFailedReason !== ''
-        "
-        style="color: red"
-      >
+      <div v-if="customVocabularySelected !== '' && customVocabularyFailedReason !== ''
+        " style="color: red">
         Vocabulary <b>{{ customVocabularySelected }}</b> failed because:<br />
         {{ customVocabularyFailedReason }}
       </div>
-      <div
-        v-if="
-          customVocabularyUnion.length === 0 &&
-          customVocabularyList.length === 0
-        "
-        style="color: red"
-      >
+      <div v-if="customVocabularyUnion.length === 0 &&
+        customVocabularyList.length === 0
+        " style="color: red">
         Make changes to the subtitles in order to build a custom vocabulary.<br />
       </div>
       <div v-else-if="validVocabularyName === false" style="color: red">
@@ -312,33 +188,21 @@
         length is 200.
       </div>
     </b-modal>
-    <b-modal
-      ref="save-modal"
-      ok-title="Confirm"
-      title="Save Captions?"
-      @ok="saveCaptions()"
-    >
+    <b-modal ref="save-modal" ok-title="Confirm" title="Save Captions?" @ok="saveCaptions()">
       <p>
         Saving captions will restart a workflow that can take several minutes.
         You will not be able to edit captions until it has finished. Are you
         ready to proceed?
       </p>
     </b-modal>
-    <b-modal
-      ref="delete-vocab-modal"
-      ok-title="Confirm"
-      ok-variant="danger"
-      title="Delete Vocabulary?"
-      @ok="
-        deleteVocabularyRequest(
-          (customVocabularyName = customVocabularySelected)
-        )
-      "
-    >
+    <b-modal ref="delete-vocab-modal" ok-title="Confirm" ok-variant="danger" title="Delete Vocabulary?" @ok="
+      deleteVocabularyRequest(
+        (customVocabularyName = customVocabularySelected)
+      )
+      ">
       <p>
         Are you sure you want to permanently delete the custom vocabulary
-        <b>{{ customVocabularySelected }}</b
-        >?
+        <b>{{ customVocabularySelected }}</b>?
       </p>
     </b-modal>
     <div v-if="isBusy">
@@ -350,39 +214,20 @@
     </div>
     <div v-else>
       <div id="event-line-editor" class="event-line-editor">
-        <b-table
-          ref="selectableTable"
-          selectable
-          fixed
-          select-mode="single"
-          thead-class="hidden_header"
-          responsive="sm"
-          :items="webCaptions"
-          :fields="webCaptions_fields"
-        >
+        <b-table ref="selectableTable" selectable fixed select-mode="single" thead-class="hidden_header" responsive="sm"
+          :items="webCaptions" :fields="webCaptions_fields">
           <!-- adjust column width for captions -->
           <template #table-colgroup="scope">
-            <col
-              v-for="field in scope.fields"
-              :key="field.key"
-              :style="{ width: field.key === 'caption' ? '80%' : '20%' }"
-            />
+            <col v-for="field in scope.fields" :key="field.key"
+              :style="{ width: field.key === 'caption' ? '80%' : '20%' }" />
           </template>
           <!-- reformat timestamp to hh:mm:ss and -->
           <!-- disable timestamp edits if workflow status is not Complete -->
           <template #cell(timeslot)="data">
-            <b-form-input
-              :disabled="workflow_status !== 'Complete'"
-              class="compact-height start-time-field"
-              :value="toHHMMSS(data.item.start)"
-              @change="(new_time) => changeStartTime(new_time, data.index)"
-            />
-            <b-form-input
-              :disabled="workflow_status !== 'Complete'"
-              class="compact-height stop-time-field"
-              :value="toHHMMSS(data.item.end)"
-              @change="(new_time) => changeEndTime(new_time, data.index)"
-            />
+            <b-form-input :disabled="workflow_status !== 'Complete'" class="compact-height start-time-field"
+              :value="toHHMMSS(data.item.start)" @change="(new_time) => changeStartTime(new_time, data.index)" />
+            <b-form-input :disabled="workflow_status !== 'Complete'" class="compact-height stop-time-field"
+              :value="toHHMMSS(data.item.end)" @change="(new_time) => changeEndTime(new_time, data.index)" />
           </template>
           <template #cell(caption)="data">
             <b-container class="p-0">
@@ -391,39 +236,21 @@
                   <!-- The state on this text area will show a red alert icon
                             if the user forgets to enter any text. Otherwise we set the
                             state to null so no validity indicator is shown. -->
-                  <b-form-textarea
-                    :id="'caption' + data.index"
-                    :ref="'caption' + data.index"
-                    :disabled="workflow_status !== 'Complete'"
-                    class="custom-text-field .form-control-sm"
-                    rows="2"
-                    :value="data.item.caption"
-                    placeholder="Type subtitle here"
-                    :state="data.item.caption.length > 0 ? null : false"
-                    @change="
-                      (new_caption) => changeCaption(new_caption, data.index)
-                    "
-                    @click="captionClickHandler(data.index)"
-                  />
+                  <b-form-textarea :id="'caption' + data.index" :ref="'caption' + data.index"
+                    :disabled="workflow_status !== 'Complete'" class="custom-text-field .form-control-sm" rows="2"
+                    :value="data.item.caption" placeholder="Type subtitle here"
+                    :state="data.item.caption.length > 0 ? null : false" @change="(new_caption) => changeCaption(new_caption, data.index)
+                      " @click="captionClickHandler(data.index)" />
                 </b-col>
                 <b-col>
                   <span style="position: absolute; top: 0px">
-                    <b-button
-                      v-if="workflow_status === 'Complete'"
-                      size="sm"
-                      variant="link"
-                      @click="delete_row(data.index)"
-                    >
+                    <b-button v-if="workflow_status === 'Complete'" size="sm" variant="link"
+                      @click="delete_row(data.index)">
                       <b-icon icon="x-circle" color="lightgrey"></b-icon>
                     </b-button>
                   </span>
                   <span style="position: absolute; bottom: 0px">
-                    <b-button
-                      v-if="workflow_status === 'Complete'"
-                      size="sm"
-                      variant="link"
-                      @click="add_row(data.index)"
-                    >
+                    <b-button v-if="workflow_status === 'Complete'" size="sm" variant="link" @click="add_row(data.index)">
                       <b-icon icon="plus-square" color="lightgrey"></b-icon>
                     </b-button>
                   </span>
@@ -439,75 +266,39 @@
       <!--        <b-icon icon="upload" color="white"></b-icon> Upload JSON-->
       <!--      </b-button> &nbsp;-->
       <!-- this is the download button -->
-      <b-dropdown
-        v-if="webCaptions.length > 0"
-        id="download-dropdown"
-        text="Download VTT/SRT"
-        class="mb-2"
-        size="sm"
-        dropup
-        no-caret
-      >
+      <b-dropdown v-if="webCaptions.length > 0" id="download-dropdown" text="Download VTT/SRT" class="mb-2" size="sm"
+        dropup no-caret>
         <template slot="button-content">
           <b-icon icon="download" color="white"></b-icon> Download
         </template>
         <b-dropdown-item :href="vtt_url"> Download VTT </b-dropdown-item>
         <b-dropdown-item :href="srt_url">
           Download SRT
-        </b-dropdown-item> </b-dropdown
-      >&nbsp;
+        </b-dropdown-item> </b-dropdown>&nbsp;
       <!-- this is the save vocabulary button -->
-      <b-button
-        id="saveVocabulary"
-        v-b-tooltip.hover
+      <b-button id="saveVocabulary" v-b-tooltip.hover
         title="Save vocabulary will open a window where you can create or modify custom vocabularies for AWS Transcribe"
-        size="sm"
-        class="mb-2"
-        @click="showVocabConfirmation()"
-      >
+        size="sm" class="mb-2" @click="showVocabConfirmation()">
         <b-icon icon="card-text" color="white"></b-icon>
         Save vocabulary
       </b-button>
       &nbsp;
       <!-- this is the save edits button for when workflow is paused -->
-      <b-button
-        v-if="workflow_status === 'Waiting'"
-        id="saveCaptions"
-        size="sm"
-        class="mb-2"
-        @click="saveCaptions()"
-      >
-        <b-icon
-          v-if="isSaving"
-          icon="arrow-clockwise"
-          animation="spin"
-          color="white"
-        ></b-icon>
+      <b-button v-if="workflow_status === 'Waiting'" id="saveCaptions" size="sm" class="mb-2" @click="saveCaptions()">
+        <b-icon v-if="isSaving" icon="arrow-clockwise" animation="spin" color="white"></b-icon>
         <b-icon v-else icon="play" color="white"></b-icon>
         Save edits
       </b-button>
       <!-- this is the save edits button for when workflow complete -->
-      <b-button
-        v-if="workflow_status === 'Complete' || workflow_status === 'Error'"
-        id="editCaptions"
-        v-b-tooltip.hover
+      <b-button v-if="workflow_status === 'Complete' || workflow_status === 'Error'" id="editCaptions" v-b-tooltip.hover
         title="Save edits will regenerate the VTT and SRT caption files so they include any changes you may have made to captions."
-        size="sm"
-        class="mb-2"
-        @click="showSaveConfirmation()"
-      >
+        size="sm" class="mb-2" @click="showSaveConfirmation()">
         <b-icon icon="play" color="white"></b-icon>
         Save edits
       </b-button>
       <!-- this is the save edits button for when workflow running -->
-      <b-button
-        v-if="workflow_status === 'Started'"
-        id="editCaptionsDisabled"
-        size="sm"
-        disabled
-        class="mb-2"
-        @click="saveCaptions()"
-      >
+      <b-button v-if="workflow_status === 'Started'" id="editCaptionsDisabled" size="sm" disabled class="mb-2"
+        @click="saveCaptions()">
         <b-icon icon="arrow-clockwise" animation="spin" color="white"></b-icon>
         Saving edits
       </b-button>
@@ -519,15 +310,11 @@
       <!--          <input type="file" @change="uploadCaptionsFile">-->
       <!--        </div>-->
       <!--      </b-modal>-->
-      <div
-        v-if="
-          webCaptions.length > 0 &&
-          workflow_status !== 'Complete' &&
-          workflow_status !== 'Error' &&
-          workflow_status !== 'Waiting'
-        "
-        style="color: red"
-      >
+      <div v-if="webCaptions.length > 0 &&
+        workflow_status !== 'Complete' &&
+        workflow_status !== 'Error' &&
+        workflow_status !== 'Waiting'
+        " style="color: red">
         Editing is disabled until workflow completes.
       </div>
     </div>
@@ -766,6 +553,8 @@ export default {
         response: true,
       };
       try {
+
+        console.log('this.transcribe_language_code', this.transcribe_language_code)
         let transcribed_language = this.transcribe_language_code.split("-")[0];
         let response = await this.$Amplify.API.get(apiName, path, requestOpts);
 
@@ -777,6 +566,8 @@ export default {
           response.data.results.CaptionsCollection.filter((item) => {
             return item.LanguageCode === transcribed_language;
           })[0];
+        console.log("source_language_caption", source_language_caption);
+
         const bucket = source_language_caption.Results.S3Bucket;
         const key = source_language_caption.Results.S3Key;
         // get URL to captions file in S3
@@ -827,8 +618,18 @@ export default {
             return item.LanguageCode === transcribed_language;
           })[0];
 
+        // console.log('transcribed_language', transcribed_language)
+
+        // console.log('response', response)
+
+        // console.log('source_language_caption', source_language_caption)
+
         const bucket = source_language_caption.Results.S3Bucket;
         const key = source_language_caption.Results.S3Key;
+
+        // console.log('bucket', bucket)
+        // console.log('key', key)
+
         // get URL to captions file in S3
         path = "download";
         requestOpts = {
@@ -856,7 +657,7 @@ export default {
       if (this.customVocabularySelected !== "") {
         console.log(
           "Getting failed vocabulary details for " +
-            this.customVocabularySelected
+          this.customVocabularySelected
         );
 
         let apiName = "mieWorkflowApi";
@@ -1025,7 +826,7 @@ export default {
               });
               console.log(
                 "CUSTOM VOCABULARY: " +
-                  JSON.stringify(this.customVocabularyUnsaved)
+                JSON.stringify(this.customVocabularyUnsaved)
               );
             }
             old_phrase = "";
@@ -1220,6 +1021,8 @@ export default {
             )[0];
           this.transcribe_language_code =
             response.data.Globals.MetaData.TranscribeSourceLanguage;
+
+
           this.vocabulary_language_code = this.transcribe_language_code;
           this.vocabulary_used =
             response.data.Configuration.AnalyzeVideo.TranscribeVideo.VocabularyName;
@@ -1236,6 +1039,9 @@ export default {
               value: this.vocabulary_used,
             });
           }
+        } else {
+          this.transcribe_language_code = response.data.Configuration.Translate.TranslateWebCaptions.SourceLanguageCode;
+
         }
         this.language_model_used =
           response.data.Configuration.AnalyzeVideo.TranscribeVideo.LanguageModelName;
@@ -1895,7 +1701,7 @@ tr.b-table-row-selected {
   border-left: 1px solid #cc181e !important;
 }
 
-table.b-table-selectable > tbody > tr.b-table-row-selected > td {
+table.b-table-selectable>tbody>tr.b-table-row-selected>td {
   background-color: white !important;
 }
 </style>

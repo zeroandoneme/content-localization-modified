@@ -1,10 +1,10 @@
 {
-  "SEARCH_ENDPOINT": "https://search-opensearchservi-r52bxqkhtrnx-srecgqmilddzj7yz4ji3wvr73y.us-east-1.es.amazonaws.com",
-  "WORKFLOW_API_ENDPOINT": "https://ehta8pxt9d.execute-api.us-east-1.amazonaws.com/api/",
-  "DATAPLANE_API_ENDPOINT": "https://nbncuhyffc.execute-api.us-east-1.amazonaws.com/api/",
-  "DATAPLANE_BUCKET": "clo-miestack-p80ah5ilb2dd-dataplane-16g8ln6zc5h08",
-  "AWS_REGION": "us-east-1",
-  "USER_POOL_ID": "us-east-1_Mt2Z3A0EH",
-  "USER_POOL_CLIENT_ID": "7iiv8r8i7kj4n5lphmcank56na",
-  "IDENTITY_POOL_ID": "us-east-1:1ff51aac-d741-472f-b0b8-b595533bc1ec"
+  "SEARCH_ENDPOINT": "https://search-opensearchservi-enh5nn1hmcar-dsyt4imnxkccpbyymnrp67b6ha.eu-west-1.es.amazonaws.com",
+  "WORKFLOW_API_ENDPOINT": "https://qsr1ydj97d.execute-api.eu-west-1.amazonaws.com/api/",
+  "DATAPLANE_API_ENDPOINT": "https://hqzombatf9.execute-api.eu-west-1.amazonaws.com/api/",
+  "DATAPLANE_BUCKET": "clv1-miestack-1jyw7qq8zj4yz-dataplane-1emtgxrlf5491",
+  "AWS_REGION": "eu-west-1",
+  "USER_POOL_ID": "eu-west-1_p5CRg6mG8",
+  "USER_POOL_CLIENT_ID": "5450isp1ej9247nijf257cfu4",
+  "IDENTITY_POOL_ID": "eu-west-1:a8a811eb-9f22-46df-ba78-abdbac378a9d"
 }
