@@ -1,6 +1,3 @@
-[![scheduled-workflow](https://github.com/aws-samples/aws-media-insights-content-localization/actions/workflows/scheduled-workflow.yml/badge.svg)](https://github.com/aws-samples/aws-media-insights-content-localization/actions/workflows/scheduled-workflow.yml) [![release-workflow](https://github.com/aws-samples/aws-media-insights-content-localization/actions/workflows/release-workflow.yml/badge.svg)](https://github.com/aws-samples/aws-media-insights-content-localization/actions/workflows/release-workflow.yml)
-
-
 # Modified Content Localization on AWS 
 
 Welcome to the Modified Content Localization on AWS project! This project will help you extend the reach of your VOD content by quickly and efficiently creating accurate multi-language subtitles using AWS AI Services.  You can make manual corrections to the automatically created subtitles and use advanced AWS AI Service customization features to improve the results of the automation for your content domain. Content Localization is built on [Media Insights Engine (MIE)](https://github.com/awslabs/aws-media-insights-engine), a framework that helps accelerate the development of serverless applications that process video, images, audio, and text with artificial intelligence services and multimedia services on AWS.
