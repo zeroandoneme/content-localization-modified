@@ -29,7 +29,11 @@ dataplane_bucket = os.environ['DataplaneBucket']
 s3 = boto3.client('s3', config=config)
 
 # These names are the lowercase version of OPERATOR_NAME defined in /source/operators/operator-library.yaml
-supported_operators = ["textdetection", "mediainfo", "transcribeaudio", "transcribevideo", "translate", "genericdatalookup", "labeldetection", "celebrityrecognition", "face_search", "contentmoderation", "facedetection", "key_phrases", "entities", "webcaptions", "shotdetection", "technicalcuedetection"]
+supported_operators = ["textdetection", "mediainfo", "transcribeaudio", "transcribevideo", "translate",
+                       "genericdatalookup", "labeldetection", "celebrityrecognition", "face_search",
+                       "contentmoderation", "facedetection", "key_phrases", "entities", "webcaptions", "shotdetection",
+                       "technicalcuedetection"]
+
 
 def normalize_confidence(confidence_value):
     converted = float(confidence_value) * 100
@@ -39,6 +43,7 @@ def normalize_confidence(confidence_value):
 def convert_to_milliseconds(time_value):
     converted = float(time_value) * 1000
     return str(converted)
+
 
 def process_text_detection(asset, workflow, results):
     metadata = json.loads(results)
@@ -75,29 +80,29 @@ def process_text_detection(asset, workflow, results):
     else:
         # these results are not paged
         if len(metadata["TextDetections"]) > 0:
-                for item in metadata["TextDetections"]:
-                    try:
-                        # Handle text detection schema for videos
-                        if "TextDetection" in item:
-                            text_detection = item["TextDetection"]
-                            text_detection["Timestamp"] = item["Timestamp"]
-                            text_detection["Operator"] = "textDetection"
-                            text_detection["Workflow"] = workflow
-                            # Flatten the bbox Label array
-                            text_detection["BoundingBox"] = text_detection["Geometry"]["BoundingBox"]
-                            del text_detection["Geometry"]
-                            print(text_detection)
-                            extracted_items.append(text_detection)
-                        # Handle text detection schema for images
-                        else:
-                            text_detection = item
-                            text_detection["Operator"] = "textDetection"
-                            text_detection["Workflow"] = workflow
-                            print(text_detection)
-                            extracted_items.append(text_detection)
-                    except KeyError as e:
-                        print("KeyError: " + str(e))
-                        print("Item: " + json.dumps(item))
+            for item in metadata["TextDetections"]:
+                try:
+                    # Handle text detection schema for videos
+                    if "TextDetection" in item:
+                        text_detection = item["TextDetection"]
+                        text_detection["Timestamp"] = item["Timestamp"]
+                        text_detection["Operator"] = "textDetection"
+                        text_detection["Workflow"] = workflow
+                        # Flatten the bbox Label array
+                        text_detection["BoundingBox"] = text_detection["Geometry"]["BoundingBox"]
+                        del text_detection["Geometry"]
+                        print(text_detection)
+                        extracted_items.append(text_detection)
+                    # Handle text detection schema for images
+                    else:
+                        text_detection = item
+                        text_detection["Operator"] = "textDetection"
+                        text_detection["Workflow"] = workflow
+                        print(text_detection)
+                        extracted_items.append(text_detection)
+                except KeyError as e:
+                    print("KeyError: " + str(e))
+                    print("Item: " + json.dumps(item))
     bulk_index(es, asset, "textDetection", extracted_items)
 
 
@@ -126,7 +131,7 @@ def process_celebrity_detection(asset, workflow, results):
                                 bounding_box = item["Celebrity"]["Face"]["BoundingBox"]
                             item["BoundingBox"] = bounding_box
                             # Set IMDB URL if it exists.
-                            url=''
+                            url = ''
                             if item["Celebrity"]["Urls"]:
                                 url = item["Celebrity"]["Urls"][0]
                             item['URL'] = url
@@ -171,7 +176,7 @@ def process_celebrity_detection(asset, workflow, results):
                         elif 'BoundingBox' in item["Celebrity"]["Face"]:
                             item["BoundingBox"] = item["Celebrity"]["Face"]["BoundingBox"]
                         # Set IMDB URL if it exists.
-                        url=''
+                        url = ''
                         if item["Celebrity"]["Urls"]:
                             url = item["Celebrity"]["Urls"][0]
                         item['URL'] = url
@@ -298,7 +303,7 @@ def process_face_search(asset, workflow, results):
                 item["PersonIndex"] = item["Person"]["Index"]
                 if "BoundingBox" in item["Person"]:
                     item["PersonBoundingBox"] = item["Person"]["BoundingBox"]
-                #flatten face key
+                # flatten face key
                 if "Face" in item["Person"]:
                     item["FaceBoundingBox"] = item["Person"]["Face"]["BoundingBox"]
                     item["FaceLandmarks"] = item["Person"]["Face"]["Landmarks"]
@@ -398,6 +403,7 @@ def process_face_detection(asset, workflow, results):
                 extracted_items.append(item)
     bulk_index(es, asset, "face_detection", extracted_items)
 
+
 def process_mediainfo(asset, workflow, results):
     # This function puts mediainfo data in Elasticsearch.
     metadata = json.loads(results)
@@ -410,6 +416,7 @@ def process_mediainfo(asset, workflow, results):
             item["Workflow"] = workflow
             extracted_items.append(item)
     bulk_index(es, asset, "mediainfo", extracted_items)
+
 
 def process_generic_data(asset, workflow, results):
     # This function puts generic data in Elasticsearch.
@@ -427,7 +434,7 @@ def process_generic_data(asset, workflow, results):
                         item["Workflow"] = workflow
                         if "Label" in item:
                             # Flatten the inner Label array
-                            item["Confidence"] = float(item["Label"]["Confidence"])*100
+                            item["Confidence"] = float(item["Label"]["Confidence"]) * 100
                             item["Name"] = item["Label"]["Name"]
                             item["Instances"] = ''
                             if 'Instances' in item["Label"]:
@@ -436,7 +443,7 @@ def process_generic_data(asset, workflow, results):
                                     box["BoundingBox"]["Top"] = float(box["BoundingBox"]["Top"]) / 720
                                     box["BoundingBox"]["Left"] = float(box["BoundingBox"]["Left"]) / 1280
                                     box["BoundingBox"]["Width"] = float(box["BoundingBox"]["Width"]) / 1280
-                                    box["Confidence"] = float(box["Confidence"])*100
+                                    box["Confidence"] = float(box["Confidence"]) * 100
                                 item["Instances"] = item["Label"]["Instances"]
                             item["Parents"] = ''
                             if 'Parents' in item["Label"]:
@@ -456,7 +463,7 @@ def process_generic_data(asset, workflow, results):
                     item["Workflow"] = workflow
                     if "Label" in item:
                         # Flatten the inner Label array
-                        item["Confidence"] = float(item["Label"]["Confidence"])*100
+                        item["Confidence"] = float(item["Label"]["Confidence"]) * 100
                         item["Name"] = item["Label"]["Name"]
                         item["Instances"] = ''
                         if 'Instances' in item["Label"]:
@@ -465,7 +472,7 @@ def process_generic_data(asset, workflow, results):
                                 box["BoundingBox"]["Top"] = float(box["BoundingBox"]["Top"]) / 720
                                 box["BoundingBox"]["Left"] = float(box["BoundingBox"]["Left"]) / 1280
                                 box["BoundingBox"]["Width"] = float(box["BoundingBox"]["Width"]) / 1280
-                                box["Confidence"] = float(box["Confidence"])*100
+                                box["Confidence"] = float(box["Confidence"]) * 100
                             item["Instances"] = item["Label"]["Instances"]
                         item["Parents"] = ''
                         if 'Parents' in item["Label"]:
@@ -477,6 +484,7 @@ def process_generic_data(asset, workflow, results):
                     print("KeyError: " + str(e))
                     print("Item: " + json.dumps(item))
     bulk_index(es, asset, "labels", extracted_items)
+
 
 def process_label_detection(asset, workflow, results):
     # Rekognition label detection puts labels on an inner array in its JSON result, but for ease of search in Elasticsearch we need those results as a top level json array. So this function does that.
@@ -493,7 +501,7 @@ def process_label_detection(asset, workflow, results):
                         item["Operator"] = "label_detection"
                         item["Workflow"] = workflow
                         if "Label" in item:
-                        # Flatten the inner Label array
+                            # Flatten the inner Label array
                             item["Confidence"] = item["Label"]["Confidence"]
                             item["Name"] = item["Label"]["Name"]
                             item["Instances"] = ''
@@ -532,6 +540,7 @@ def process_label_detection(asset, workflow, results):
                     print("KeyError: " + str(e))
                     print("Item: " + json.dumps(item))
     bulk_index(es, asset, "labels", extracted_items)
+
 
 def process_technical_cue_detection(asset, workflow, results):
     metadata = json.loads(results)
@@ -647,9 +656,10 @@ def process_translate(asset, workflow, results):
     es = connect_es(es_endpoint)
     index_document(es, asset, "translation", translation)
 
+
 def process_webcaptions(asset, workflow, results, language_code):
     metadata = json.loads(results)
-    metadata_type = "webcaptions"+"_"+language_code
+    metadata_type = "webcaptions" + "_" + language_code
 
     webcaptions = metadata
     webcaptions["Workflow"] = workflow
@@ -660,37 +670,50 @@ def process_webcaptions(asset, workflow, results, language_code):
 
 def process_transcribe(asset, workflow, results, type):
     metadata = json.loads(results)
+    print('metadata')
+    print(metadata)
 
-    transcript = metadata["results"]["transcripts"][0]
+    # Extract the transcript from metadata
+    transcript = metadata["results"]["transcripts"][0].copy()
     transcript["workflow"] = workflow
-    transcript_time = metadata["results"]["items"]
 
-    index_name = type+"transcript"
+    # Connect to Elasticsearch
+    index_name = type + "transcript"
     es = connect_es(es_endpoint)
-    index_document(es, asset, index_name, transcript)
 
+    # Check if the jobName contains 'whisper'
+    if 'whisper' in metadata['jobName']:
+        # Index the document without items
+        index_document(es, asset, index_name, transcript)
+    else:
+        # Extract time-based items and process them
+        transcript_time = metadata["results"]["items"]
 
-    transcribe_items = []
+        # Process items
+        transcribe_items = []
 
-    for item in transcript_time:
-        content = item["alternatives"][0]["content"]
-        confidence = normalize_confidence(item["alternatives"][0]["confidence"])
-        if "start_time" in item and "end_time" in item:
-            start_time = convert_to_milliseconds(item["start_time"])
-            end_time = convert_to_milliseconds(item["end_time"])
-            item["start_time"] = start_time
-            item["end_time"] = end_time
+        for item in transcript_time:
+            content = item["alternatives"][0]["content"]
+            confidence = normalize_confidence(item["alternatives"][0]["confidence"])
 
-        del item["alternatives"]
+            if "start_time" in item and "end_time" in item:
+                start_time = convert_to_milliseconds(item["start_time"])
+                end_time = convert_to_milliseconds(item["end_time"])
+                item["start_time"] = start_time
+                item["end_time"] = end_time
 
-        item["confidence"] = confidence
-        item["content"] = content
-        item["Workflow"] = workflow
-        item["Operator"] = "transcribe"
+            del item["alternatives"]
 
-        transcribe_items.append(item)
+            item["confidence"] = confidence
+            item["content"] = content
+            item["Workflow"] = workflow
+            item["Operator"] = "transcribe"
 
-    bulk_index(es, asset, index_name, transcribe_items)
+            transcribe_items.append(item)
+
+        # Index transcript document along with items
+        index_document(es, asset, index_name, transcript)
+        bulk_index(es, asset, index_name, transcribe_items)
 
 
 def process_entities(asset, workflow, results):
@@ -747,11 +770,6 @@ def process_keyphrases(asset, workflow, results):
     bulk_index(es, asset, "key_phrases", formatted_phrases)
 
 
-def process_initialization(asset, results):
-    es = connect_es(es_endpoint)
-    bulk_index(es, asset, "initialization", [results])
-
-
 def connect_es(endpoint):
     # Handle aws auth for es# Create a config
 
@@ -788,11 +806,11 @@ def delete_asset_metadata_by_index(es_object, asset_id, index):
 
 def delete_asset_all_indices(es_object, asset_id):
     delete_query = {
-      "query": {
-        "match": {
-          "AssetId": asset_id
+        "query": {
+            "match": {
+                "AssetId": asset_id
+            }
         }
-      }
     }
 
     try:
@@ -818,12 +836,12 @@ def bulk_index(es_object, asset, index, data):
     # size that is well below the "Maximum Size of HTTP Request Payloads" for the smallest AWS
     # Elasticsearch instance type (10MB). See service limits here:
     # https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/aes-limits.html
-    maxPayloadSize=5000000
+    maxPayloadSize = 8000000
     for item in data:
         item["AssetId"] = asset
         action = json.dumps({"index": {"_index": es_index, "_type": "_doc"}})
         doc = json.dumps(item)
-        if ((len('\n'.join(actions_to_send))+len(action)+len(doc)) < maxPayloadSize):
+        if ((len('\n'.join(actions_to_send)) + len(action) + len(doc)) < maxPayloadSize):
             actions_to_send.append(action)
             actions_to_send.append(doc)
         else:
@@ -915,21 +933,7 @@ def lambda_handler(event, context):
         if action is None:
             print("Unable to determine action type")
         elif action == "INSERT":
-            # The initial insert action will contain the filename and timestamp.
-            # Persist the filename and timestamp to Elasticsearch so users can find
-            # assets by searching those fields.
-            try:
-                # Get filename and timestamp from the payload of the stream message
-                s3_key = payload['S3Key']
-                filename = s3_key.split("/")[-1]
-                created = payload['Created']
-                extracted_items = []
-                metadata = {"filename": filename, "created": created}
-                extracted_items.append(metadata)
-                # Save the filename and timestamp to Elasticsearch
-                process_initialization(asset_id, metadata)
-            except KeyError as e:
-                print("Missing required keys in kinesis payload:", e)
+            print("Not handling INSERT actions")
         elif action == "MODIFY":
             try:
                 operator = payload['Operator']
@@ -941,7 +945,8 @@ def lambda_handler(event, context):
                 # Read in json metadata from s3
                 metadata = read_json_from_s3(s3_pointer)
                 if metadata["Status"] == "Success":
-                    print("Retrieved {operator} metadata from s3, inserting into Elasticsearch".format(operator=operator))
+                    print(
+                        "Retrieved {operator} metadata from s3, inserting into Elasticsearch".format(operator=operator))
                     operator = operator.lower()
                     # webcaptions operators are processed the same, but they have a language extension
                     # in the operator name.  Strip that off now.  Any language is supported for search
