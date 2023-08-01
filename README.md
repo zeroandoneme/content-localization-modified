@@ -1,13 +1,10 @@
-[![scheduled-workflow](https://github.com/aws-samples/aws-media-insights-content-localization/actions/workflows/scheduled-workflow.yml/badge.svg)](https://github.com/aws-samples/aws-media-insights-content-localization/actions/workflows/scheduled-workflow.yml) [![release-workflow](https://github.com/aws-samples/aws-media-insights-content-localization/actions/workflows/release-workflow.yml/badge.svg)](https://github.com/aws-samples/aws-media-insights-content-localization/actions/workflows/release-workflow.yml)
-
-
 # Modified Content Localization on AWS 
 
 Welcome to the Modified Content Localization on AWS project! This project will help you extend the reach of your VOD content by quickly and efficiently creating accurate multi-language subtitles using AWS AI Services.  You can make manual corrections to the automatically created subtitles and use advanced AWS AI Service customization features to improve the results of the automation for your content domain. Content Localization is built on [Media Insights Engine (MIE)](https://github.com/awslabs/aws-media-insights-engine), a framework that helps accelerate the development of serverless applications that process video, images, audio, and text with artificial intelligence services and multimedia services on AWS.
 
 The modified version of the Content Localization on AWS project provides significant improvement to the original AWS solution by enabling the workflow to be run based on an subtitle file only. This modification greatly streamlines the process of creating multi-language subtitles, resulting in a significant reduction of both time and cost by up to 70% from the initial solution {in the previouis solution you were forced to have the video as well}.
 
-![Architecture Overview](doc/images/ContentLocalizationArchitectureOverview.png)
+![Architecture Overview](doc/images/ArchitectureOverview.png)
 Localization is the process of taking video content that was created for audiences in one geography and transforming it to make it relevant and accessible to audiences in a new geography.  Creating alternative language subtitle tracks is central to the localization process.  This application presents a guided experience for automatically generating and correcting subtitles for videos in multiple languages using AWS AI Services.  The corrections made by editors can be used to customize the results of AWS AI services for future workflows.  This type of AI/ML workflow, which incorporates user corrections is often referred to as “human in the loop”.
 
 Content Localization workflows can make use of advanced customization features provided by Amazon Transcribe and Amazon Translate:
@@ -37,12 +34,14 @@ As a first step, this project seeks to create an efficient, customizable workflo
 
 The following Cloudformation templates will deploy the Content Localization front-end application with a prebuilt version of the most recent MIE release.
 
+
 Region| Launch
 ------|-----
-US West (Oregon) | [![Launch in us-west-2](doc/images/launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/new?stackName=clo&templateURL=https://zero-and-one-solutions.s3.ap-south-1.amazonaws.com/content-localization-on-aws-modified/content-localization/v0.0/content-localization-on-aws.yaml)
-EU West (Ireland) | [![Launch in eu-west-1](doc/images/launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/new?stackName=clo&templateURL=https://zero-and-one-solutions-eu-west-1.s3.eu-west-1.amazonaws.com/content-localization-on-aws-modified/content-localization/v0.0/content-localization-on-aws.yaml)
+US West (Oregon) | [![Launch in us-west-2](doc/images/launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/new?stackName=clo&templateURL=https://zero-and-one-solutions-us-west-2.s3.us-west-2.amazonaws.com/content-localization-on-aws-modified/content-localization/v1.0/content-localization-on-aws-us-west-2.yaml)
+EU West (Ireland) | [![Launch in eu-west-1](doc/images/launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/new?stackName=clo&templateURL=https://zero-and-one-solutions-eu-west-1.s3.eu-west-1.amazonaws.com/content-localization-on-aws-modified/content-localization/v1.0/content-localization-on-aws.yaml)
 
 For more installation options, see the [Advanced Installation](#advanced-installation-options) section.
+
 
 # Screenshots
 
@@ -56,12 +55,22 @@ Workflow configuration:
 
 
 # COST
+You are responsible for the cost of the AWS services used while running this application. The primary cost factors are from using Amazon Rekognition, Amazon Transcribe, Amazon Translate, Amazon Comprehend, Amazon Polly, Amazon OpenSearch Service (successor to Amazon Elasticsearch Service), and Amazon SageMaker Asynchronous Inference. With all services enabled, Videos cost about $0.50 per minute to process, but can vary between $0.10 per minute and $0.60 per minute depending on the video content and the types of analysis enabled in the application. The default workflow for Content Localization only enables Amazon Transcribe, Amazon Translate, Amazon Comprehend, and Amazon Polly. Data storage and Amazon ES will cost approximately $10.00 per day regardless of the quantity or type of video content.
 
-You are responsible for the cost of the AWS services used while running this application. The primary cost factors are from using Amazon Rekognition, Amazon Transcribe, Amazon Translate, Amazon Comprehend, Amazon Polly and Amazon OpenSearch Service (successor to Amazon Elasticsearch Service). With all services enabled, Videos cost about $0.50 per minute to process, but can vary between $0.10 per minute and $0.60 per minute depending on the video content and the types of analysis enabled in the application.  The default workflow for Content Localization only enables Amazon Transcribe, Amazon Translate, Amazon Comprehend, and Amazon Polly.   Data storage and Amazon ES will cost approximately ***$10.00 per day*** regardless of the quantity or type of video content.
+Amazon SageMaker Asynchronous Inference is a near-real-time inference option that queues incoming requests and processes them asynchronously. This option is particularly useful when you need to process large payloads as the data arrives, or run models that have long inference processing times and do not have sub-second latency requirements. By utilizing Amazon SageMaker Asynchronous Inference, you can also save on costs as it allows for autoscaling the instance count to zero when there are no requests to process. This way, you only pay when your endpoint is processing requests, making it a cost-efficient solution for varying workloads.
 
 After a video is uploaded into the solution, the costs for processing are a one-time expense. However, data storage costs occur daily.
 
-For more information about cost, see the pricing webpage for each AWS service you will be using in this solution. If you need to process a large volume of videos, we recommend that you contact your AWS account representative for at-scale pricing. 
+Example: Default subtitles workflow only, no customizations for Amazon Transcribe and Translate <br>
+AWS service	Dimensions	Cost [USD] <br>
+Amazon Transcribe	30 minutes of standard audio transcription	$0.72 / video -- Languages other than Turkish and Arabic <br>
+Amazon SageMaker Asynchronous Inference (assuming type is deafault ml.g4dn.2xlarge) 30 minutes $0.5235 / video -- for Turkish and Arabic Languages <br>
+Amazon Translate	30,500 characters, 5 languages	$2.29 / video <br>
+Amazon Polly	30,500 characters, 5 languages	$0.60 / video <br>
+AWS Elemental MediaConvert	30 minutes, basic tier (<= 30 fps) at SD rate	$0.36 / video <br>
+Amazon OpenSearch Service	t3.small.search instance	$1.39 / day <br>
+Amazon Kinesis Data Streams	Shard hours	$0.28 / day <br>
+Total cost for processing one video, including daily costs:	$5.4435 - $5.64 <br> 
 
 
 
@@ -120,9 +129,9 @@ aws s3 mb s3://$TEMPLATE_OUTPUT_BUCKET --region $REGION
 ```
 
 
-Once you have built the demo app with the above commands, then it's time to deploy it. You have two options, depending on whether you want to deploy over an existing MIE stack or a new one:
+Once you have built the demo app with the above commands, then it's time to deploy it.
 
-#### *Option 1:* Install Content Localization on AWS over an existing MIE stack
+#### Install Content Localization on AWS over an existing MIE stack
 
 Use these commands to deploy the demo app over an existing MIE stack:
 
@@ -133,15 +142,6 @@ TEMPLATE=[copy "With existing MIE deployment" link from output of build script]
 aws cloudformation create-stack --stack-name $WEBAPP_STACK_NAME --template-url $TEMPLATE --region $REGION --parameters ParameterKey=MieStackName,ParameterValue=$MIE_STACK_NAME ParameterKey=AdminEmail,ParameterValue=$EMAIL --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND --profile default --disable-rollback
 ```
 
-#### *Option 2:* Install Content Localization on AWS with a new MIE stack
-
-Use these commands to deploy the demo app over a new MIE stack:
-
-
-```
-TEMPLATE=[copy "Without existing MIE deployment" link from output of build script]
-aws cloudformation create-stack --stack-name $WEBAPP_STACK_NAME --template-url $TEMPLATE --region $REGION --parameters ParameterKey=AdminEmail,ParameterValue=$EMAIL --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND --profile default --disable-rollback
-```
 
 ### Tests
 
